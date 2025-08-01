@@ -19,14 +19,14 @@ const Statistics = ({good, neutral, bad}) => {
     )
   } else {
     return (
-      <div>
+      <table>
         <StatisticLine text="Good" value={good} />
         <StatisticLine text="Neutral" value={neutral} />
         <StatisticLine text="Bad" value={bad} />
         <StatisticLine text="All" value={getTotal()} />
         <StatisticLine text="Average" value={getAverage()} />
         <StatisticLine text="Positive (%)" value={getPositive()} />
-      </div>
+      </table>
     )
   }
 }

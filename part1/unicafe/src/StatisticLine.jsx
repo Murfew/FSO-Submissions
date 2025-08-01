@@ -1,6 +1,6 @@
 const StatisticLine = ({text, value}) => {
   return (
-    <p>{text}: {value}</p>
+    <tr>{text}: {value}</tr>
   )
 }
 
