@@ -3,9 +3,9 @@ import Part from "./Part"
 const Content = (props) => {
   return (
     <>
-      <Part content={props.part1} exercises={props.exercises1}/>
-      <Part content={props.part2} exercises={props.exercises2}/>
-      <Part content={props.part3} exercises={props.exercises3}/>
+      <Part content={props.parts[0].name} exercises={props.parts[0].exercises}/>
+      <Part content={props.parts[1].name} exercises={props.parts[1].exercises}/>
+      <Part content={props.parts[2].name} exercises={props.parts[2].exercises}/>
     </>
   )
 }
