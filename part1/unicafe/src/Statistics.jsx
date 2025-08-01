@@ -1,3 +1,5 @@
+import StatisticLine from "./StatisticLine"
+
 const Statistics = ({good, neutral, bad}) => {
   const getAverage = () => {
     return (good - bad) / getTotal()
@@ -18,12 +20,12 @@ const Statistics = ({good, neutral, bad}) => {
   } else {
     return (
       <div>
-        <p>Good: {good}</p>
-        <p>Neutral: {neutral}</p>
-        <p>Bad: {bad}</p>
-        <p>All : {getTotal()}</p>
-        <p>Average: {getAverage()}</p>
-        <p>Positive: {getPositive()} %</p>
+        <StatisticLine text="Good" value={good} />
+        <StatisticLine text="Neutral" value={neutral} />
+        <StatisticLine text="Bad" value={bad} />
+        <StatisticLine text="All" value={getTotal()} />
+        <StatisticLine text="Average" value={getAverage()} />
+        <StatisticLine text="Positive (%)" value={getPositive()} />
       </div>
     )
   }
