@@ -5,6 +5,12 @@ const App = () => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  const incrementVote = (position) => {
+    const copy = [...votes];
+    copy[position] += 1
+    setVotes(copy)
+  }
+
   const anecdotes = [
     'If it hurts, do it more often.',
     'Adding manpower to a late software project makes it later!',
@@ -17,10 +23,13 @@ const App = () => {
   ]
 
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0))
 
   return (
     <div>
       <p>{anecdotes[selected]}</p>
+      <p>This anecdote has {votes[selected]} votes!</p>
+      <button onClick={() => incrementVote(selected)}>Vote!</button>
       <button onClick={() => setSelected(getRandomIntFromInterval(0, anecdotes.length - 1))}>Next anecdote</button>
     </div>
   )
