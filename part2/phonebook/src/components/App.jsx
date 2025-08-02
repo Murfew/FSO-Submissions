@@ -6,9 +6,19 @@ const App = () => {
   ])
   const [newName, setNewName] = useState('')
 
+  const checkDuplicate = (name) => {
+    return persons.filter((person) => person.name.toLowerCase === name.toLowerCase).length !== 0
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
-    setPersons(persons.concat({name: newName}))
+    const duplicate = checkDuplicate(newName)
+
+    if (duplicate) {
+      alert(`${newName} is already in the phonebook`)
+    } else {
+      setPersons(persons.concat({name: newName}))
+    }
     setNewName("")
   }
 
