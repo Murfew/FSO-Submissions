@@ -42,26 +42,37 @@ const App = () => {
     setNewNumber('')
   }
 
-  const onFilterChange = (event) => {
-    setNewFilter(event.target.value)
-  }
-
-  const onNameChange = (event) => {
-    setNewName(event.target.value)
-  }
-
-  const onNumberChange = (event) => {
-    setNewNumber(event.target.value)
+  const deletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService
+        .remove(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id))
+        })
+    }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter filter={newFilter} onFilterChange={onFilterChange}/>
+      <Filter
+        filter={newFilter}
+        onFilterChange={(event) => setNewFilter(event.target.value)}
+      />
       <h3>Add new</h3>
-      <PersonForm onFormSubmit={addPerson} name={newName} onNameChange={onNameChange} number={newNumber} onNumberChange={onNumberChange}/>
+      <PersonForm
+        onFormSubmit={addPerson}
+        name={newName}
+        onNameChange={(event) => setNewName(event.target.value)}
+        number={newNumber}
+        onNumberChange={(event) => setNewNumber(event.target.value)}
+      />
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={newFilter}/>
+      <Persons
+        persons={persons}
+        filter={newFilter}
+        handleDelete={deletePerson}
+      />
     </div>
   )
 }
