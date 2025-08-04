@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import personService from '../services/persons'
 import Filter from './Filter'
+import Notification from './Notification'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
 
@@ -10,6 +11,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -37,6 +40,17 @@ const App = () => {
             setPersons(persons.map(person =>
               person.id !== personToUpdate.id ? person : updatedPerson
             ))
+            setSuccessMessage(`Changed ${updatedPerson.name}'s number to ${updatedPerson.number}`)
+            setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000)
+          })
+          .catch(() => {
+            setErrorMessage(`Information of ${personToUpdate.name} has already been removed from the server`)
+            setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000)
+            setPersons(persons.filter(person => person.id !== personToUpdate.id))
           })
       }
 
@@ -46,6 +60,10 @@ const App = () => {
         .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          setSuccessMessage(`Added ${newPerson.name}`)
+          setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000)
         })
     }
     setNewName('')
@@ -65,6 +83,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage !== null ? successMessage : errorMessage} className={successMessage !== null ? 'success' : 'error'}/>
       <Filter
         filter={newFilter}
         onFilterChange={(event) => setNewFilter(event.target.value)}
