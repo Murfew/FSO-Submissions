@@ -29,11 +29,21 @@ const App = () => {
     const duplicate = checkDuplicate(newName)
 
     if (duplicate) {
-      alert(`${newName} is already in the phonebook`)
+      const personToUpdate = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
+      if (window.confirm(`${newName} is already in the phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(personToUpdate.id, { ...personToUpdate, number: newNumber})
+          .then(updatedPerson => {
+            setPersons(persons.map(person =>
+              person.id !== personToUpdate.id ? person : updatedPerson
+            ))
+          })
+      }
+
     } else {
-      const personObject = {name: newName, number: newNumber};
+      const newPerson = {name: newName, number: newNumber};
       personService
-        .create(personObject)
+        .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
         })
