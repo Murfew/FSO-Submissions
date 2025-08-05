@@ -63,6 +63,10 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ error: 'content missing' });
   }
 
+  if (data.filter((person) => person.name.toLowerCase() === body.name.toLowerCase()).length !== 0) {
+    return response.status(400).json({ error: 'name already exists in phonebook' });
+  }
+
   const person = {
     name: body.name,
     number: body.number,
