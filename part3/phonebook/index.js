@@ -10,13 +10,17 @@ app.use(express.json());
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
-app.get('/info', (request, response) => {
-  const count = data.length;
-  const time = new Date();
-  response.send(
-    `<p>Phonebook has info for ${count} people</p>
-    <p>${time}</p>`
-  );
+app.get('/info', (request, response, next) => {
+  Person.find({})
+    .then((people) => {
+      const count = people.length;
+      const time = new Date();
+      response.send(
+        `<p>Phonebook has info for ${count} people</p>
+         <p>${time}</p>`
+      );
+    })
+    .catch((error) => next(error));
 });
 
 app.get('/api/persons', (request, response, next) => {
