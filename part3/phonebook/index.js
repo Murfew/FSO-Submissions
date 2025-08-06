@@ -46,19 +46,14 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ error: 'content missing' });
   }
 
-  if (data.filter((person) => person.name.toLowerCase() === body.name.toLowerCase()).length !== 0) {
-    return response.status(400).json({ error: 'name already exists in phonebook' });
-  }
-
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: Math.floor(Math.random() * 100000000),
-  };
+  });
 
-  data = data.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT;
