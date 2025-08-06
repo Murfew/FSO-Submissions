@@ -22,6 +22,19 @@ const App = () => {
       })
   }, [])
 
+  const showError = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+  }
+
+  const showSuccess = (message) => {
+    setSuccessMessage(message)
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 5000)
+  }
 
   const checkDuplicate = (name) => {
     return persons.filter((person) => person.name.toLowerCase() === name.toLowerCase()).length !== 0
@@ -40,16 +53,10 @@ const App = () => {
             setPersons(persons.map(person =>
               person.id !== personToUpdate.id ? person : updatedPerson
             ))
-            setSuccessMessage(`Changed ${updatedPerson.name}'s number to ${updatedPerson.number}`)
-            setTimeout(() => {
-              setSuccessMessage(null)
-            }, 5000)
+            showSuccess(`Changed ${updatedPerson.name}'s number to ${updatedPerson.number}`)
           })
-          .catch(() => {
-            setErrorMessage(`Information of ${personToUpdate.name} has already been removed from the server`)
-            setTimeout(() => {
-              setSuccessMessage(null)
-            }, 5000)
+          .catch((error) => {
+            showError(error.response.data.error)
             setPersons(persons.filter(person => person.id !== personToUpdate.id))
           })
       }
@@ -60,10 +67,9 @@ const App = () => {
         .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
-          setSuccessMessage(`Added ${newPerson.name}`)
-          setTimeout(() => {
-              setSuccessMessage(null)
-            }, 5000)
+          showSuccess(`Added ${newPerson.name}`)
+        }).catch(error => {
+          showError(error.response.data.error)
         })
     }
     setNewName('')

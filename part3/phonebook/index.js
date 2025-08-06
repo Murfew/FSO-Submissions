@@ -54,10 +54,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   const body = request.body;
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({ error: 'content missing' });
-  }
-
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -74,18 +70,17 @@ app.post('/api/persons', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body;
 
-  Person.findById(request.params.id)
-    .then((person) => {
-      if (!person) {
-        return response.status(404).end();
-      }
-
-      person.name = name;
-      person.number = number;
-
-      return person.save().then((updatedPerson) => {
+  Person.findByIdAndUpdate(
+    request.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: 'query' }
+  )
+    .then((updatedPerson) => {
+      if (updatedPerson) {
         response.json(updatedPerson);
-      });
+      } else {
+        response.status(404).end();
+      }
     })
     .catch((error) => next(error));
 });
