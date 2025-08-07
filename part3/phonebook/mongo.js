@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const mongoose = require('mongoose');
 
 if (process.argv.length < 3) {
@@ -26,7 +27,7 @@ if (process.argv.length === 5) {
     number: process.argv[4],
   });
 
-  person.save().then((result) => {
+  person.save().then(() => {
     console.log(`added ${process.argv[3]} number ${process.argv[4]} to the phonebook`);
     mongoose.connection.close();
   });

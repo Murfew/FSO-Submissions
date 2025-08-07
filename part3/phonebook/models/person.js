@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+require('dotenv').config();
 const mongoose = require('mongoose');
 
 mongoose.set('strictQuery', false);
@@ -7,7 +9,7 @@ const url = process.env.MONGODB_URI;
 console.log('connecting to', url);
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log('connected to MongoDB');
   })
   .catch((error) => {
@@ -25,20 +27,19 @@ const personSchema = new mongoose.Schema({
     minLength: 8,
     required: true,
     validate: {
-      validator: (value) => {
-        return /^\d{2,3}-\d+$/.test(value);
-      },
+      validator: (value) => /^\d{2,3}-\d+$/.test(value),
       message: (props) => `${props.value} is not a valid phone number!`,
     },
   },
 });
 
 personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
+  transform: (document, returnedObject) => ({
+    // eslint-disable-next-line no-underscore-dangle
+    id: returnedObject._id.toString(),
+    name: returnedObject.name,
+    number: returnedObject.number,
+  }),
 });
 
 module.exports = mongoose.model('Person', personSchema);
