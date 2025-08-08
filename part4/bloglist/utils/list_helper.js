@@ -25,9 +25,21 @@ const mostBlogs = (blogs) =>
     .maxBy('blogs')
     .value();
 
+const mostLikes = (blogs) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  _.chain(blogs)
+    .groupBy('author')
+    .map((posts, author) => ({
+      author,
+      likes: _.sumBy(posts, 'likes'),
+    }))
+    .maxBy('likes')
+    .value();
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 };
