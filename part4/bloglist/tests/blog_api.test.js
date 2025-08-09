@@ -26,6 +26,16 @@ test('blogs are returned as JSON', async () => {
     .expect('Content-Type', /application\/json/);
 });
 
+test('all blog posts have id property and no _id', async () => {
+  const response = await api.get('/api/blogs');
+
+  response.body.forEach((blog) => {
+    assert.ok(blog.id);
+    // eslint-disable-next-line no-underscore-dangle
+    assert.strictEqual(blog._id, undefined);
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
