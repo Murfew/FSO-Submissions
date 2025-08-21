@@ -105,6 +105,22 @@ describe('when there are initially some blogs saved', () => {
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
     });
   });
+
+  describe('updating the number of likes of a blog', () => {
+    test('succeeds with status code 200 if id is valid', async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToUpdate = blogsAtStart[0];
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send({ likes: 10 })
+        .expect(200);
+
+      const blogsAtEnd = await helper.blogsInDb();
+
+      assert.strictEqual(blogsAtEnd[0].likes, 10);
+    });
+  });
 });
 
 after(async () => {
