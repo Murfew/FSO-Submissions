@@ -57,6 +57,18 @@ test('a valid blog can be added ', async () => {
   assert(titles.includes('Test Blog'));
 });
 
+test('if likes is missing, it defaults to 0', async () => {
+  const newBlog = {
+    title: 'Blog without likes',
+    author: 'John Doe',
+    url: 'http://test.com',
+  };
+
+  const response = await api.post('/api/blogs').send(newBlog);
+
+  assert.strictEqual(response.body.likes, 0);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
