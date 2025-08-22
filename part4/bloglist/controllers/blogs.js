@@ -49,10 +49,16 @@ blogsRouter.delete(
 
     try {
       const blog = await Blog.findById(request.params.id);
-      if (blog.user.toString() === user.toString()) {
-        Blog.findByIdAndDelete(request.params.id);
-        response.status(204).end();
+      if (!blog) {
+        return response.status(404).end();
       }
+      if (blog.user.toString() !== user._id.toString()) {
+        return response
+          .status(403)
+          .json({ error: 'only the creator can delete a blog' });
+      }
+      await Blog.findByIdAndDelete(request.params.id);
+      response.status(204).end();
     } catch (error) {
       next(error);
     }

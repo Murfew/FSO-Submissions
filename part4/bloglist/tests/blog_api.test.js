@@ -11,9 +11,30 @@ const User = require('../models/user');
 const api = supertest(app);
 
 describe('when there are initially some blogs saved', () => {
+  let token;
+
   beforeEach(async () => {
     await Blog.deleteMany({});
-    await Blog.insertMany(helper.initialBlogs);
+    await User.deleteMany({});
+
+    // Create a user
+    const passwordHash = await bcrypt.hash('sekret', 10);
+    const user = new User({ username: 'root', passwordHash });
+    await user.save();
+
+    // Log in to get token
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'sekret' });
+    token = loginResponse.body.token;
+
+    // Add initial blogs with the user as owner
+    const userFromDb = await User.findOne({ username: 'root' });
+    const blogsWithUser = helper.initialBlogs.map((blog) => ({
+      ...blog,
+      user: userFromDb._id,
+    }));
+    await Blog.insertMany(blogsWithUser);
   });
 
   test('blogs are returned as JSON', async () => {
@@ -57,6 +78,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -74,7 +96,11 @@ describe('when there are initially some blogs saved', () => {
         url: 'http://test.com',
       };
 
-      await api.post('/api/blogs').send(newBlog).expect(400);
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog)
+        .expect(400);
     });
 
     test('fails with status code 400 if url is invalid', async () => {
@@ -83,7 +109,11 @@ describe('when there are initially some blogs saved', () => {
         title: 'No URL blog',
       };
 
-      await api.post('/api/blogs').send(newBlog).expect(400);
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog)
+        .expect(400);
     });
 
     test('sets likes to 0 if it is missing', async () => {
@@ -93,7 +123,10 @@ describe('when there are initially some blogs saved', () => {
         url: 'http://test.com',
       };
 
-      const response = await api.post('/api/blogs').send(newBlog);
+      const response = await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog);
 
       assert.strictEqual(response.body.likes, 0);
     });
@@ -104,7 +137,10 @@ describe('when there are initially some blogs saved', () => {
       const blogsAtStart = await helper.blogsInDb();
       const blogToDelete = blogsAtStart[0];
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204);
 
       const blogsAtEnd = await helper.blogsInDb();
 
@@ -122,6 +158,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send({ likes: 10 })
         .expect(200)
         .expect('Content-Type', /application\/json/);
@@ -139,7 +176,6 @@ describe('when there is initially one user in db', () => {
 
     const passwordHash = await bcrypt.hash('sekret', 10);
     const user = new User({ username: 'root', passwordHash });
-
     await user.save();
   });
 
