@@ -27,6 +27,13 @@ describe('when there are initially some blogs saved', () => {
     assert.strictEqual(response.body.length, helper.initialBlogs.length);
   });
 
+  test('a specific blog is within the returned blogs', async () => {
+    const response = await api.get('/api/blogs');
+
+    const titles = response.body.map((blog) => blog.title);
+    assert(titles.includes('React patterns'));
+  });
+
   test('all blog posts have id property and no _id', async () => {
     const response = await api.get('/api/blogs');
 
@@ -114,7 +121,8 @@ describe('when there are initially some blogs saved', () => {
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
         .send({ likes: 10 })
-        .expect(200);
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
 
       const blogsAtEnd = await helper.blogsInDb();
 
