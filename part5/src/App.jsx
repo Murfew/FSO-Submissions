@@ -4,6 +4,7 @@ import blogService from './services/blogs';
 import loginService from './services/login';
 import LoginForm from './components/LoginForm';
 import BlogForm from './components/BlogForm';
+import Notification from './components/Notification';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -13,6 +14,8 @@ const App = () => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -31,6 +34,20 @@ const App = () => {
     }
   }, []);
 
+  const showError = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
+
+  const showSuccess = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
+  };
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -41,10 +58,7 @@ const App = () => {
       setUsername('');
       setPassword('');
     } catch (error) {
-      // setErrorMessage('wrong credentials');
-      // setTimeout(() => {
-      //   setErrorMessage(null);
-      // }, 5000);
+      showError('Wrong username or password!');
     }
   };
 
@@ -55,9 +69,13 @@ const App = () => {
 
   const createBlog = (event) => {
     event.preventDefault();
+
     const newBlog = { title, author, url };
     blogService.create(newBlog);
     setBlogs(blogs.concat(newBlog));
+
+    showSuccess(`A new blog \'${title}\' by ${author} has been added!`);
+
     setAuthor('');
     setTitle('');
     setUrl('');
@@ -67,6 +85,10 @@ const App = () => {
     return (
       <div>
         <h2>Login</h2>
+        <Notification
+          message={successMessage !== null ? successMessage : errorMessage}
+          className={successMessage !== null ? 'success' : 'error'}
+        />
         <LoginForm
           handleLogin={handleLogin}
           username={username}
@@ -86,6 +108,10 @@ const App = () => {
       </div>
 
       <h2>Add Blog</h2>
+      <Notification
+        message={successMessage !== null ? successMessage : errorMessage}
+        className={successMessage !== null ? 'success' : 'error'}
+      />
       <BlogForm
         author={author}
         setAuthor={setAuthor}
