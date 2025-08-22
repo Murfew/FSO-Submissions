@@ -9,7 +9,7 @@ const Blog = ({ blog, handleLike }) => {
       <button onClick={() => setShowDetails(!showDetails)}>View</button>
       {showDetails && (
         <>
-          <p>{blog.url}</p>
+          <a>{blog.url}</a>
           <p>
             {blog.likes} likes <button onClick={handleLike}>Like!</button>
           </p>
