@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 const Blog = ({ blog, handleLike, user, handleRemove }) => {
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(false)
 
   return (
-    <div className="blog">
+    <div className='blog'>
       {blog.title}{' '}
       <button onClick={() => setShowDetails(!showDetails)}>View</button>
       {showDetails && (
@@ -22,7 +22,7 @@ const Blog = ({ blog, handleLike, user, handleRemove }) => {
         </>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog
