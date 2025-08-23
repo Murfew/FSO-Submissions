@@ -5,8 +5,10 @@ const Blog = ({ blog, handleLike, user, handleRemove }) => {
 
   return (
     <div className='blog'>
-      {blog.title}{' '}
-      <button onClick={() => setShowDetails(!showDetails)}>View</button>
+      {blog.title} {!showDetails && blog.author}
+      <button onClick={() => setShowDetails(!showDetails)}>
+        {showDetails ? 'Hide' : 'Show'}
+      </button>
       {showDetails && (
         <>
           <p>
