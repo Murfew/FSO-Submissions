@@ -63,3 +63,36 @@ test("renders likes and url once the 'show' button is clicked", async () => {
   const likes = await screen.findByText('10 likes')
   expect(likes).toBeDefined()
 })
+
+test('the event handler for the like button is called twice when the button is cliked twice', async () => {
+  const blog = {
+    title: 'Test blog',
+    author: 'Tester',
+    url: 'example.com',
+    likes: 10,
+    user: { username: 'testuser' },
+  }
+
+  const testUser = { username: 'testuser' }
+
+  const mockLikeHandler = vi.fn()
+
+  render(
+    <Blog
+      blog={blog}
+      handleLike={mockLikeHandler}
+      user={testUser}
+      handleRemove={() => {}}
+    />
+  )
+
+  const user = userEvent.setup()
+  const showButton = await screen.findByText('Show')
+  await user.click(showButton)
+
+  const likeButton = await screen.findByText('Like!')
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(mockLikeHandler.mock.calls).toHaveLength(2)
+})
