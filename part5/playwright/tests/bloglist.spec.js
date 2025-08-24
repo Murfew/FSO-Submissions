@@ -84,7 +84,7 @@ describe('Blog app', () => {
       await expect(
         blogComponent.getByRole('button', { name: 'Show' })
       ).toBeVisible()
-      await expect(blogContainer.getByText(newBlog.url)).not.toBeVisible()
+      await expect(blogComponent.getByText(blog.url)).not.toBeVisible()
     })
 
     describe('and a blog exists', () => {
@@ -109,6 +109,31 @@ describe('Blog app', () => {
         await page.getByRole('button', { name: 'Like!' }).click()
 
         await expect(page.getByText('1 likes')).toBeVisible()
+      })
+
+      test('it can be deleted by the user who created it', async ({ page }) => {
+        const blogComponent = page
+          .locator('.blog')
+          .filter({
+            hasText: 'Test Blog',
+          })
+          .filter({
+            hasText: 'TESTER',
+          })
+
+        await blogComponent.getByRole('button', { name: 'Show' }).click()
+
+        page.on('dialog', async (dialog) => {
+          expect(dialog.message()).toContain('Are you sure')
+          await dialog.accept()
+        })
+        const removeButton = blogComponent.getByRole('button', {
+          name: 'Remove',
+        })
+        await expect(removeButton).toBeVisible()
+        await removeButton.click()
+
+        await expect(blogComponent).not.toBeVisible()
       })
     })
   })
