@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test --trace on",
+    "test": "playwright test",
     "test:report": "playwright show-report"
   },
   "keywords": [],

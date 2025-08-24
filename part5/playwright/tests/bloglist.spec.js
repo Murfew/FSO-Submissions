@@ -136,7 +136,7 @@ describe('Blog app', () => {
         await expect(blogComponent).not.toBeVisible()
       })
 
-      test.only('only the user who created the blog can see the remove button', async ({
+      test('only the user who created the blog can see the remove button', async ({
         page,
         request,
       }) => {
@@ -164,12 +164,78 @@ describe('Blog app', () => {
           },
         })
 
-        loginWith(page, 'efaultz', 'secret')
+        await loginWith(page, 'efaultz', 'secret')
 
         await blogComponent.getByRole('button', { name: 'Show' }).click()
         await expect(
           blogComponent.getByRole('button', { name: 'Remove' })
         ).not.toBeVisible()
+      })
+    })
+
+    describe('and multiple blogs exist', () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, 'Test Blog 1', 'TESTER 1', 'test1.com')
+        await createBlog(page, 'Test Blog 2', 'TESTER 2', 'test2.com')
+        await createBlog(page, 'Test Blog 3', 'TESTER 3', 'test3.com')
+      })
+      test('they are sorted by number of likes', async ({ page }) => {
+        const blogComponent1 = page
+          .locator('.blog')
+          .filter({
+            hasText: 'Test Blog 1',
+          })
+          .filter({
+            hasText: 'TESTER 1',
+          })
+
+        const blogComponent2 = page
+          .locator('.blog')
+          .filter({
+            hasText: 'Test Blog 2',
+          })
+          .filter({
+            hasText: 'TESTER 2',
+          })
+
+        const blogComponent3 = page
+          .locator('.blog')
+          .filter({
+            hasText: 'Test Blog 3',
+          })
+          .filter({
+            hasText: 'TESTER 3',
+          })
+
+        await blogComponent1.getByRole('button', { name: 'Show' }).click()
+        await blogComponent2.getByRole('button', { name: 'Show' }).click()
+        await blogComponent3.getByRole('button', { name: 'Show' }).click()
+
+        for (let i = 0; i < 2; i++) {
+          await blogComponent3.getByRole('button', { name: 'Like!' }).click()
+
+          await expect(
+            blogComponent3.locator('p', { hasText: 'likes' })
+          ).toContainText(`${i + 1} likes`)
+        }
+
+        for (let i = 0; i < 1; i++) {
+          await blogComponent2.getByRole('button', { name: 'Like!' }).click()
+
+          await expect(
+            blogComponent2.locator('p', { hasText: 'likes' })
+          ).toContainText(`${i + 1} likes`)
+        }
+
+        await blogComponent1.getByRole('button', { name: 'Hide' }).click()
+        await blogComponent2.getByRole('button', { name: 'Hide' }).click()
+        await blogComponent3.getByRole('button', { name: 'Hide' }).click()
+
+        const blogComponents = await page.locator('.blog').all()
+
+        await expect(blogComponents[0]).toContainText('Test Blog 3')
+        await expect(blogComponents[1]).toContainText('Test Blog 2')
+        await expect(blogComponents[2]).toContainText('Test Blog 1')
       })
     })
   })
