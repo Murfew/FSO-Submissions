@@ -135,6 +135,42 @@ describe('Blog app', () => {
 
         await expect(blogComponent).not.toBeVisible()
       })
+
+      test.only('only the user who created the blog can see the remove button', async ({
+        page,
+        request,
+      }) => {
+        const blogComponent = page
+          .locator('.blog')
+          .filter({
+            hasText: 'Test Blog',
+          })
+          .filter({
+            hasText: 'TESTER',
+          })
+
+        await blogComponent.getByRole('button', { name: 'Show' }).click()
+        await expect(
+          blogComponent.getByRole('button', { name: 'Remove' })
+        ).toBeVisible()
+
+        await page.getByRole('button', { name: 'Logout' }).click()
+
+        await request.post('/api/users', {
+          data: {
+            name: 'Eleane Faultz',
+            username: 'efaultz',
+            password: 'secret',
+          },
+        })
+
+        loginWith(page, 'efaultz', 'secret')
+
+        await blogComponent.getByRole('button', { name: 'Show' }).click()
+        await expect(
+          blogComponent.getByRole('button', { name: 'Remove' })
+        ).not.toBeVisible()
+      })
     })
   })
 })
