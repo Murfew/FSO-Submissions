@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import loginService from '../services/login'
+import blogService from '../services/blogs'
 
 const LoginForm = ({ setUser, showError }) => {
   const [username, setUsername] = useState('')
@@ -12,9 +13,11 @@ const LoginForm = ({ setUser, showError }) => {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       setUser(user)
+      blogService.setToken(user.token)
       setUsername('')
       setPassword('')
-    } catch {
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
       showError('Wrong username or password!')
     }
   }

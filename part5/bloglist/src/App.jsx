@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
@@ -60,7 +61,7 @@ const App = () => {
       )
 
       blogFormRef.current.toggleVisibility()
-    } catch {
+    } catch (error) {
       showError('Failed to create blog')
     }
   }
@@ -70,7 +71,7 @@ const App = () => {
       const updatedBlog = { ...blog, likes: blog.likes + 1 }
       const returnedBlog = await blogService.update(blog.id, updatedBlog)
       setBlogs(blogs.map((b) => (b.id !== blog.id ? b : returnedBlog)))
-    } catch {
+    } catch (error) {
       showError('Failed to like this blog')
     }
   }
@@ -85,7 +86,7 @@ const App = () => {
         await blogService.remove(blog.id)
         setBlogs(blogs.filter((b) => b.id !== blog.id))
       }
-    } catch {
+    } catch (error) {
       showError('Failed to delete blog')
     }
   }
