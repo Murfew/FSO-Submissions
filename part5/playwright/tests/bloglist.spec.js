@@ -86,5 +86,30 @@ describe('Blog app', () => {
       ).toBeVisible()
       await expect(blogContainer.getByText(newBlog.url)).not.toBeVisible()
     })
+
+    describe('and a blog exists', () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, 'Test Blog', 'TESTER', 'test.com')
+      })
+
+      test('it can be liked', async ({ page }) => {
+        const blogComponent = page
+          .locator('.blog')
+          .filter({
+            hasText: 'Test Blog',
+          })
+          .filter({
+            hasText: 'TESTER',
+          })
+
+        await blogComponent.getByRole('button', { name: 'Show' }).click()
+
+        await expect(page.getByText('0 likes')).toBeVisible()
+
+        await page.getByRole('button', { name: 'Like!' }).click()
+
+        await expect(page.getByText('1 likes')).toBeVisible()
+      })
+    })
   })
 })
