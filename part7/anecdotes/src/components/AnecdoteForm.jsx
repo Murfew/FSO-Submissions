@@ -1,10 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const AnecdoteForm = ({ addNew }) => {
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -14,6 +16,10 @@ const AnecdoteForm = ({ addNew }) => {
       info,
       votes: 0,
     })
+    setAuthor('')
+    setContent('')
+    setInfo('')
+    navigate('/')
   }
 
   return (
