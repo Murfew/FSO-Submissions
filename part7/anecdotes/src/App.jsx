@@ -4,7 +4,8 @@ import AnecdoteList from './components/AnecdoteList'
 import About from './components/About'
 import Footer from './components/Footer'
 import AnecdoteForm from './components/AnecdoteForm'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useMatch } from 'react-router-dom'
+import Anecdote from './components/Anecdote'
 
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
@@ -24,6 +25,7 @@ const App = () => {
     },
   ])
 
+  // eslint-disable-next-line no-unused-vars
   const [notification, setNotification] = useState('')
 
   const addNew = (anecdote) => {
@@ -33,6 +35,7 @@ const App = () => {
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id)
 
+  // eslint-disable-next-line no-unused-vars
   const vote = (id) => {
     const anecdote = anecdoteById(id)
 
@@ -44,6 +47,9 @@ const App = () => {
     setAnecdotes(anecdotes.map((a) => (a.id === id ? voted : a)))
   }
 
+  const match = useMatch('/anecdotes/:id')
+  const anecdote = match ? anecdoteById(Number(match.params.id)) : null
+
   return (
     <div>
       <h1>Software anecdotes</h1>
@@ -53,6 +59,10 @@ const App = () => {
         <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path='/about' element={<About />} />
         <Route path='/create' element={<AnecdoteForm addNew={addNew} />} />
+        <Route
+          path='/anecdotes/:id'
+          element={<Anecdote anecdote={anecdote} />}
+        />
       </Routes>
 
       <Footer />
