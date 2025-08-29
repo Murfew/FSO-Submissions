@@ -19,6 +19,12 @@ const AnecdoteForm = ({ addNew }) => {
     navigate('/')
   }
 
+  const handleReset = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
   return (
     <div>
       <h2>Create a new anecdote</h2>
@@ -35,7 +41,10 @@ const AnecdoteForm = ({ addNew }) => {
           URL for more info
           <input {...info} />
         </div>
-        <button>Create</button>
+        <button type='submit'>Create</button>
+        <button type='reset' onClick={handleReset}>
+          Reset
+        </button>
       </form>
     </div>
   )
