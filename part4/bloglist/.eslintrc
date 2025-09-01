@@ -1,4 +1,3 @@
 {
-  "extends": "airbnb",
-  "object-curly-newline": "off"
+  "extends": "airbnb"
 }
