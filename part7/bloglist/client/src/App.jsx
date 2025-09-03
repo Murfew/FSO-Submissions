@@ -10,12 +10,11 @@ import NewBlog from './components/NewBlog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { useNotification } from './contexts/NotificationContext'
+import { useUser } from './contexts/UserContext'
 
 const App = () => {
-  const [user, setUser] = useState(null)
-
+  const [user, userDispatch] = useUser()
   const [notification, notificationDispatch] = useNotification()
-
   const queryClient = useQueryClient()
 
   const newBlogMutation = useMutation({
@@ -42,8 +41,9 @@ const App = () => {
   useEffect(() => {
     const user = storage.loadUser()
     if (user) {
-      setUser(user)
+      userDispatch({ type: 'SET', payload: user })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const result = useQuery({
@@ -75,7 +75,7 @@ const App = () => {
   const handleLogin = async (credentials) => {
     try {
       const user = await loginService.login(credentials)
-      setUser(user)
+      userDispatch({ type: 'SET', payload: user })
       storage.saveUser(user)
       notify(`Welcome back, ${user.name}`)
     } catch (error) {
@@ -95,7 +95,7 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    setUser(null)
+    userDispatch({ type: 'REMOVE' })
     storage.removeUser()
     notify(`Bye, ${user.name}!`)
   }
