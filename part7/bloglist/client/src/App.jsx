@@ -20,9 +20,22 @@ const App = () => {
 
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
-    onSuccess: (newBlog) => {
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    onSuccess: () => {
+      queryClient.invalidateQueries(['blogs'])
+    },
+  })
+
+  const likeBlogMutation = useMutation({
+    mutationFn: blogService.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['blogs'])
+    },
+  })
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['blogs'])
     },
   })
 
@@ -71,21 +84,14 @@ const App = () => {
   }
 
   const handleCreate = async (blog) => {
-    const newBlog = await blogService.create(blog)
-    newBlogMutation.mutate(newBlog)
-    notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
+    newBlogMutation.mutate(blog)
+    notify(`Blog created: ${blog.title}, ${blog.author}`)
     blogFormRef.current.toggleVisibility()
   }
 
   const handleVote = async (blog) => {
-    console.log('updating', blog)
-    const updatedBlog = await blogService.update(blog.id, {
-      ...blog,
-      likes: blog.likes + 1,
-    })
-
-    notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
-    setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
+    likeBlogMutation.mutate({ ...blog, likes: blog.likes + 1 })
+    notify(`You liked ${blog.title} by ${blog.author}`)
   }
 
   const handleLogout = () => {
@@ -96,8 +102,7 @@ const App = () => {
 
   const handleDelete = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      await blogService.remove(blog.id)
-      setBlogs(blogs.filter((b) => b.id !== blog.id))
+      deleteBlogMutation.mutate(blog.id)
       notify(`Blog ${blog.title}, by ${blog.author} removed`)
     }
   }
