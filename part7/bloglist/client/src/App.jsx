@@ -1,5 +1,6 @@
 import { useState, useEffect, createRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -11,6 +12,7 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { useNotification } from './contexts/NotificationContext'
 import { useUser } from './contexts/UserContext'
+import Users from './pages/Users'
 
 const App = () => {
   const [user, userDispatch] = useUser()
@@ -127,17 +129,24 @@ const App = () => {
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
       </div>
-      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-        <NewBlog doCreate={handleCreate} />
-      </Togglable>
-      {blogs.sort(byLikes).map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleVote={handleVote}
-          handleDelete={handleDelete}
-        />
-      ))}
+
+      <Router>
+        <Routes>
+          <Route path='/users' element={<Users />} />
+        </Routes>
+
+        {/* <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+          <NewBlog doCreate={handleCreate} />
+        </Togglable>
+        {blogs.sort(byLikes).map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            handleVote={handleVote}
+            handleDelete={handleDelete}
+          />
+        ))} */}
+      </Router>
     </div>
   )
 }
