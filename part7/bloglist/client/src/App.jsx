@@ -1,9 +1,10 @@
-import { useState, useEffect, createRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route, useMatch } from 'react-router-dom'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
+import userService from './services/users'
 import storage from './services/storage'
 import Login from './components/Login'
 import Blog from './components/Blog'
@@ -12,12 +13,14 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { useNotification } from './contexts/NotificationContext'
 import { useUser } from './contexts/UserContext'
-import Users from './pages/Users'
+import UsersPage from './pages/UsersPage'
+import UserPage from './pages/UserPage'
 
 const App = () => {
   const [user, userDispatch] = useUser()
   const [notification, notificationDispatch] = useNotification()
   const queryClient = useQueryClient()
+  const blogFormRef = useRef()
 
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
@@ -48,24 +51,27 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const result = useQuery({
+  const blogsQuery = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
     retry: 1,
     refetchOnWindowFocus: false,
   })
 
-  if (result.isLoading) {
-    return <div>Loading data...</div>
-  }
+  const usersQuery = useQuery({
+    queryKey: ['users'],
+    queryFn: userService.getAll,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  })
 
-  if (result.isError) {
-    return <div>Blog service not available due to problems in the server</div>
-  }
+  if (blogsQuery.isLoading || usersQuery.isLoading)
+    return <p>Loading data...</p>
+  if (blogsQuery.isError) return <p>Error with the blog server</p>
+  if (usersQuery.isError) return <p>Error with the user server</p>
 
-  const blogs = result.data
-
-  const blogFormRef = createRef()
+  const blogs = blogsQuery.data
+  const users = usersQuery.data
 
   const notify = (payload, type = 'SUCCESS') => {
     notificationDispatch({ type, payload })
@@ -130,23 +136,22 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </div>
 
-      <Router>
-        <Routes>
-          <Route path='/users' element={<Users />} />
-        </Routes>
+      <Routes>
+        <Route path='/users' element={<UsersPage users={users} />} />
+        <Route path='/users/:id' element={<UserPage users={users} />} />
+      </Routes>
 
-        {/* <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-          <NewBlog doCreate={handleCreate} />
-        </Togglable>
-        {blogs.sort(byLikes).map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleVote={handleVote}
-            handleDelete={handleDelete}
-          />
-        ))} */}
-      </Router>
+      {/*   <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+        <NewBlog doCreate={handleCreate} />
+      </Togglable>
+      {blogs.sort(byLikes).map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleVote={handleVote}
+          handleDelete={handleDelete}
+        />
+      ))} */}
     </div>
   )
 }
