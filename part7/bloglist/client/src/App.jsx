@@ -8,11 +8,12 @@ import Blog from './components/Blog'
 import NewBlog from './components/NewBlog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import { useNotification } from './contexts/NotificationContext'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
+  const [notification, notificationDispatch] = useNotification()
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -27,10 +28,10 @@ const App = () => {
 
   const blogFormRef = createRef()
 
-  const notify = (message, type = 'success') => {
-    setNotification({ message, type })
+  const notify = (payload, type = 'SUCCESS') => {
+    notificationDispatch({ type, payload })
     setTimeout(() => {
-      setNotification(null)
+      notificationDispatch({ type: 'CLEAR' })
     }, 5000)
   }
 
@@ -41,7 +42,7 @@ const App = () => {
       storage.saveUser(user)
       notify(`Welcome back, ${user.name}`)
     } catch (error) {
-      notify('Wrong credentials', 'error')
+      notify('Wrong credentials', 'ERROR')
     }
   }
 
