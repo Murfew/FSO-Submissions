@@ -7,14 +7,16 @@ const getConfit = () => ({
   headers: { Authorization: `Bearer ${storage.loadUser().token}` },
 })
 
-const getAll = () => {
+const getAll = async () => {
   const request = axios.get(baseUrl)
-  return request.then((response) => response.data)
+  const response = await request
+  return response.data
 }
 
-const update = (id, newObject) => {
+const update = async (id, newObject) => {
   const request = axios.put(`${baseUrl}/${id}`, newObject, getConfit())
-  return request.then((response) => response.data)
+  const response = await request
+  return response.data
 }
 
 const create = async (newObject) => {

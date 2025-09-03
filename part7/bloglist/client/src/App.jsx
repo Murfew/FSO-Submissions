@@ -1,4 +1,5 @@
 import { useState, useEffect, createRef } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -11,13 +12,19 @@ import Togglable from './components/Togglable'
 import { useNotification } from './contexts/NotificationContext'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
+
   const [notification, notificationDispatch] = useNotification()
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const queryClient = useQueryClient()
+
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    },
+  })
 
   useEffect(() => {
     const user = storage.loadUser()
@@ -25,6 +32,23 @@ const App = () => {
       setUser(user)
     }
   }, [])
+
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  })
+
+  if (result.isLoading) {
+    return <div>Loading data...</div>
+  }
+
+  if (result.isError) {
+    return <div>Blog service not available due to problems in the server</div>
+  }
+
+  const blogs = result.data
 
   const blogFormRef = createRef()
 
@@ -48,7 +72,7 @@ const App = () => {
 
   const handleCreate = async (blog) => {
     const newBlog = await blogService.create(blog)
-    setBlogs(blogs.concat(newBlog))
+    newBlogMutation.mutate(newBlog)
     notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
     blogFormRef.current.toggleVisibility()
   }
