@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 import storage from '../services/storage'
 import blogService from '../services/blogs'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 const Blog = ({ blog, notificationFn }) => {
   const queryClient = useQueryClient()
   const navigagte = useNavigate()
+  const [comment, setComment] = useState('')
 
   const likeBlogMutation = useMutation({
     mutationFn: blogService.update,
@@ -20,6 +22,13 @@ const Blog = ({ blog, notificationFn }) => {
     onSuccess: () => {
       queryClient.invalidateQueries(['blogs'])
       navigagte('/')
+    },
+  })
+
+  const createCommentMutation = useMutation({
+    mutationFn: blogService.createComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['blogs'])
     },
   })
 
@@ -39,6 +48,10 @@ const Blog = ({ blog, notificationFn }) => {
     }
   }
 
+  const handleComment = async () => {
+    createCommentMutation.mutate({ id: blog.id, comment })
+  }
+
   return (
     <div>
       <h2>
@@ -53,6 +66,22 @@ const Blog = ({ blog, notificationFn }) => {
       </div>
       <div>added by {nameOfUser}</div>
       {canRemove && <button onClick={() => handleDelete(blog)}>remove</button>}
+      <div>
+        <h3>comments</h3>
+        <div>
+          <input
+            type='text'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <button onClick={() => handleComment()}>add comment</button>
+        </div>
+        <ul>
+          {blog.comments.map((c, index) => (
+            <li key={index}>{c}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

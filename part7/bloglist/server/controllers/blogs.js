@@ -23,7 +23,8 @@ router.post('/', userExtractor, async (request, response) => {
     return response.status(400).json({ error: 'title or url missing' })
   }
 
-  blog.likes = blog.likes | 0
+  blog.likes = 0
+  blog.comments = []
   blog.user = user
   user.blogs = user.blogs.concat(blog._id)
 
@@ -39,7 +40,7 @@ router.delete('/:id', userExtractor, async (request, response) => {
 
   const blog = await Blog.findById(request.params.id)
   if (!blog) {
-    return response.status(204).end()
+    return response.status(404).json({ error: 'blog not found' })
   }
 
   if (blog.user && user.id.toString() !== blog.user.toString()) {
@@ -61,16 +62,37 @@ router.put('/:id', async (request, response) => {
   const body = request.body
 
   const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
     likes: body.likes,
   }
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
     new: true,
   }).populate('user', { username: 1, name: 1 })
+
+  if (!updatedBlog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
+
   response.json(updatedBlog)
+})
+
+router.post('/:id/comments', async (request, response) => {
+  const blogId = request.params.id
+
+  const blog = await Blog.findById(blogId)
+  if (!blog) {
+    return response.status(404).end()
+  }
+
+  const comment = request.body.comment
+  if (!comment || comment.trim().length === 0) {
+    return response.status(400).json({ error: 'invalid comment' })
+  }
+
+  blog.comments.push(comment)
+
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog)
 })
 
 module.exports = router
