@@ -7,41 +7,17 @@ import loginService from './services/login'
 import userService from './services/users'
 import storage from './services/storage'
 import Login from './components/Login'
-import Blog from './components/Blog'
-import NewBlog from './components/NewBlog'
 import Notification from './components/Notification'
-import Togglable from './components/Togglable'
 import { useNotification } from './contexts/NotificationContext'
 import { useUser } from './contexts/UserContext'
 import UsersPage from './pages/UsersPage'
 import UserPage from './pages/UserPage'
+import BlogsPage from './pages/BlogsPage'
+import BlogPage from './pages/BlogPage'
 
 const App = () => {
   const [user, userDispatch] = useUser()
   const [notification, notificationDispatch] = useNotification()
-  const queryClient = useQueryClient()
-  const blogFormRef = useRef()
-
-  const newBlogMutation = useMutation({
-    mutationFn: blogService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['blogs'])
-    },
-  })
-
-  const likeBlogMutation = useMutation({
-    mutationFn: blogService.update,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['blogs'])
-    },
-  })
-
-  const deleteBlogMutation = useMutation({
-    mutationFn: blogService.remove,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['blogs'])
-    },
-  })
 
   useEffect(() => {
     const user = storage.loadUser()
@@ -91,28 +67,10 @@ const App = () => {
     }
   }
 
-  const handleCreate = async (blog) => {
-    newBlogMutation.mutate(blog)
-    notify(`Blog created: ${blog.title}, ${blog.author}`)
-    blogFormRef.current.toggleVisibility()
-  }
-
-  const handleVote = async (blog) => {
-    likeBlogMutation.mutate({ ...blog, likes: blog.likes + 1 })
-    notify(`You liked ${blog.title} by ${blog.author}`)
-  }
-
   const handleLogout = () => {
     userDispatch({ type: 'REMOVE' })
     storage.removeUser()
     notify(`Bye, ${user.name}!`)
-  }
-
-  const handleDelete = async (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      deleteBlogMutation.mutate(blog.id)
-      notify(`Blog ${blog.title}, by ${blog.author} removed`)
-    }
   }
 
   if (!user) {
@@ -124,8 +82,6 @@ const App = () => {
       </div>
     )
   }
-
-  const byLikes = (a, b) => b.likes - a.likes
 
   return (
     <div>
@@ -139,19 +95,15 @@ const App = () => {
       <Routes>
         <Route path='/users' element={<UsersPage users={users} />} />
         <Route path='/users/:id' element={<UserPage users={users} />} />
-      </Routes>
-
-      {/*   <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-        <NewBlog doCreate={handleCreate} />
-      </Togglable>
-      {blogs.sort(byLikes).map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleVote={handleVote}
-          handleDelete={handleDelete}
+        <Route
+          path='/'
+          element={<BlogsPage blogs={blogs} notificationFn={notify} />}
         />
-      ))} */}
+        <Route
+          path='/blogs/:id'
+          element={<BlogPage blogs={blogs} notificationFn={notify} />}
+        />
+      </Routes>
     </div>
   )
 }
