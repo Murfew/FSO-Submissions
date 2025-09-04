@@ -14,6 +14,7 @@ import UsersPage from './pages/UsersPage'
 import UserPage from './pages/UserPage'
 import BlogsPage from './pages/BlogsPage'
 import BlogPage from './pages/BlogPage'
+import Header from './components/Header'
 
 const App = () => {
   const [user, userDispatch] = useUser()
@@ -76,7 +77,7 @@ const App = () => {
   if (!user) {
     return (
       <div>
-        <h2>blogs</h2>
+        <h2>blog app</h2>
         <Notification notification={notification} />
         <Login doLogin={handleLogin} />
       </div>
@@ -85,12 +86,10 @@ const App = () => {
 
   return (
     <div>
-      <h2>blogs</h2>
+      <Header user={user} handleLogout={handleLogout} />
       <Notification notification={notification} />
-      <div>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </div>
+
+      <h2>blog app</h2>
 
       <Routes>
         <Route path='/users' element={<UsersPage users={users} />} />

@@ -3,8 +3,6 @@ const User = ({ user }) => {
     return null
   }
 
-  console.log(user)
-
   return (
     <div>
       <h2>{user.name}</h2>
