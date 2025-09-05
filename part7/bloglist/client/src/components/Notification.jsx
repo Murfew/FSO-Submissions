@@ -1,3 +1,5 @@
+import { Alert, Box } from '@mui/material'
+
 const Notification = ({ notification }) => {
   if (!notification) {
     return null
@@ -5,16 +7,13 @@ const Notification = ({ notification }) => {
 
   const { message, type } = notification
 
-  const style = {
-    backgroundColor: 'lightgrey',
-    margin: '10px',
-    padding: '10px',
-    border: '2px solid',
-    borderColor: type === 'success' ? 'green' : 'red',
-    borderRadius: '5px',
-  }
-
-  return <div style={style}>{message}</div>
+  return (
+    <Box sx={{ my: 2 }}>
+      <Alert severity={type === 'success' ? 'success' : 'error'}>
+        {message}
+      </Alert>
+    </Box>
+  )
 }
 
 export default Notification

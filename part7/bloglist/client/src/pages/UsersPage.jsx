@@ -1,4 +1,15 @@
 import { Link } from 'react-router-dom'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+} from '@mui/material'
 
 const UsersPage = ({ users }) => {
   if (!users) {
@@ -6,29 +17,47 @@ const UsersPage = ({ users }) => {
   }
 
   return (
-    <div>
-      <h2>Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th># of blogs</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => {
-            return (
-              <tr key={user.id}>
-                <td>
-                  <Link to={`/users/${user.id}`}>{user.name}</Link>
-                </td>
-                <td>{user.blogs.length}</td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+      <Paper sx={{ p: 4, maxWidth: 600, width: '100%' }} elevation={3}>
+        <Typography variant='h5' gutterBottom>
+          Users
+        </Typography>
+
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: 'primary.light' }}>
+                <TableCell
+                  sx={{ fontWeight: 'bold', color: 'primary.contrastText' }}
+                >
+                  Name
+                </TableCell>
+                <TableCell
+                  sx={{ fontWeight: 'bold', color: 'primary.contrastText' }}
+                >
+                  # of blogs
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id} hover>
+                  <TableCell>
+                    <Link
+                      to={`/users/${user.id}`}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      {user.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{user.blogs.length}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    </Box>
   )
 }
 

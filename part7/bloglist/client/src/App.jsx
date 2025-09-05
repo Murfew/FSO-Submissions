@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Routes, Route, useMatch } from 'react-router-dom'
 
+import { Container, Box, Typography } from '@mui/material'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/users'
@@ -76,34 +78,47 @@ const App = () => {
 
   if (!user) {
     return (
-      <div>
-        <h2>blog app</h2>
-        <Notification notification={notification} />
-        <Login doLogin={handleLogin} />
-      </div>
+      <Container maxWidth='sm'>
+        <Box sx={{ mt: 8 }}>
+          <Notification notification={notification} />
+          <Typography variant='h4' gutterBottom>
+            Blog App
+          </Typography>
+          <Login doLogin={handleLogin} />
+        </Box>
+      </Container>
     )
   }
 
+  // Main app layout
   return (
-    <div>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <Header user={user} handleLogout={handleLogout} />
-      <Notification notification={notification} />
 
-      <h2>blog app</h2>
+      <Container maxWidth='md' sx={{ mt: 4 }}>
+        {/* Notification */}
+        <Notification notification={notification} />
 
-      <Routes>
-        <Route path='/users' element={<UsersPage users={users} />} />
-        <Route path='/users/:id' element={<UserPage users={users} />} />
-        <Route
-          path='/'
-          element={<BlogsPage blogs={blogs} notificationFn={notify} />}
-        />
-        <Route
-          path='/blogs/:id'
-          element={<BlogPage blogs={blogs} notificationFn={notify} />}
-        />
-      </Routes>
-    </div>
+        {/* Page Title */}
+        <Typography variant='h4' gutterBottom>
+          Blog App
+        </Typography>
+
+        {/* Routes */}
+        <Routes>
+          <Route path='/users' element={<UsersPage users={users} />} />
+          <Route path='/users/:id' element={<UserPage users={users} />} />
+          <Route
+            path='/'
+            element={<BlogsPage blogs={blogs} notificationFn={notify} />}
+          />
+          <Route
+            path='/blogs/:id'
+            element={<BlogPage blogs={blogs} notificationFn={notify} />}
+          />
+        </Routes>
+      </Container>
+    </Box>
   )
 }
 

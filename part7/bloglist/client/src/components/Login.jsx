@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { Box, Button, TextField, Typography, Paper } from '@mui/material'
+
 const Login = ({ doLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -12,27 +14,55 @@ const Login = ({ doLogin }) => {
   }
 
   return (
-    <form onSubmit={handleLogin}>
-      <label>
-        Username:
-        <input
-          type='text'
-          data-testid='username'
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        bgcolor: 'background.default',
+        mt: 8,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{ p: 4, maxWidth: 400, width: '100%' }}
+        component='form'
+        onSubmit={handleLogin}
+      >
+        <Typography variant='h5' gutterBottom>
+          Login
+        </Typography>
+
+        <TextField
+          fullWidth
+          label='Username'
+          variant='outlined'
+          margin='normal'
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-      </label>
-      <label>
-        Password:
-        <input
+
+        <TextField
+          fullWidth
+          label='Password'
           type='password'
+          variant='outlined'
+          margin='normal'
           value={password}
-          data-testid='password'
           onChange={(e) => setPassword(e.target.value)}
         />
-      </label>
-      <input type='submit' value='Login' />
-    </form>
+
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          Login
+        </Button>
+      </Paper>
+    </Box>
   )
 }
 

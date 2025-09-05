@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { Box, Button, TextField, Typography, Paper } from '@mui/material'
 
 const NewBlog = ({ doCreate }) => {
   const [title, setTitle] = useState('')
@@ -26,39 +27,62 @@ const NewBlog = ({ doCreate }) => {
   }
 
   return (
-    <div>
-      <h2>Create a New Blog</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Title:</label>
-          <input
-            type='text'
-            data-testid='title'
-            value={title}
-            onChange={handleTitleChange}
-          />
-        </div>
-        <div>
-          <label>URL:</label>
-          <input
-            type='text'
-            data-testid='url'
-            value={url}
-            onChange={handleUrlChange}
-          />
-        </div>
-        <div>
-          <label>Author:</label>
-          <input
-            type='text'
-            data-testid='author'
-            value={author}
-            onChange={handleAuthorChange}
-          />
-        </div>
-        <button type='submit'>Create</button>
-      </form>
-    </div>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        mt: 4,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{ p: 4, maxWidth: 500, width: '100%' }}
+        component='form'
+        onSubmit={handleSubmit}
+      >
+        <Typography variant='h6' gutterBottom>
+          Create a New Blog
+        </Typography>
+
+        <TextField
+          fullWidth
+          label='Title'
+          variant='outlined'
+          margin='normal'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <TextField
+          fullWidth
+          label='URL'
+          variant='outlined'
+          margin='normal'
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+        />
+
+        <TextField
+          fullWidth
+          label='Author'
+          variant='outlined'
+          margin='normal'
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
+
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          Create
+        </Button>
+      </Paper>
+    </Box>
   )
 }
 

@@ -5,16 +5,19 @@ import blogService from '../services/blogs'
 import { useRef } from 'react'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import {
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableContainer,
+  Paper,
+  Typography,
+  Box,
+} from '@mui/material'
 
 const BlogsPage = ({ blogs, notificationFn }) => {
-  const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1,
-    marginBottom: 5,
-    borderColor: 'black',
-  }
-
   const blogFormRef = useRef()
   const queryClient = useQueryClient()
 
@@ -34,16 +37,49 @@ const BlogsPage = ({ blogs, notificationFn }) => {
   }
 
   return (
-    <div>
-      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+    <Box sx={{ mt: 4 }}>
+      <Togglable buttonLabel='Create new blog' ref={blogFormRef}>
         <NewBlog doCreate={handleCreate} />
       </Togglable>
-      {blogs.sort(byLikes).map((blog) => (
-        <div style={style} key={blog.id}>
-          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-        </div>
-      ))}
-    </div>
+
+      <Typography variant='h6' gutterBottom sx={{ mt: 4 }}>
+        Blogs
+      </Typography>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ bgcolor: 'primary.light' }}>
+              <TableCell
+                sx={{ fontWeight: 'bold', color: 'primary.contrastText' }}
+              >
+                Title
+              </TableCell>
+              <TableCell
+                sx={{ fontWeight: 'bold', color: 'primary.contrastText' }}
+              >
+                Author
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {blogs.sort(byLikes).map((blog) => (
+              <TableRow key={blog.id} hover>
+                <TableCell>
+                  <Link
+                    to={`/blogs/${blog.id}`}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    {blog.title}
+                  </Link>
+                </TableCell>
+                <TableCell>{blog.author}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   )
 }
 

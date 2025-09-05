@@ -1,32 +1,32 @@
 import { Link } from 'react-router-dom'
 
+import { AppBar, Toolbar, Button, Box, Typography } from '@mui/material'
+
 const Header = ({ user, handleLogout }) => {
-  const navStyle = {
-    backgroundColor: 'lightgray',
-    padding: 8,
-  }
-
-  const linkStyle = {
-    marginRight: 5,
-  }
-
-  const buttonStyle = {
-    marginLeft: 5,
-  }
-
   return (
-    <nav style={navStyle}>
-      <Link style={linkStyle} to='/'>
-        blogs
-      </Link>
-      <Link style={linkStyle} to='/users'>
-        users
-      </Link>
-      {user.name} logged in
-      <button style={buttonStyle} onClick={() => handleLogout()}>
-        logout
-      </button>
-    </nav>
+    <AppBar position='static'>
+      <Toolbar>
+        {/* Left side nav links */}
+        <Box sx={{ flexGrow: 1, display: 'flex', gap: 2 }}>
+          <Button color='inherit' component={Link} to='/'>
+            Blogs
+          </Button>
+          <Button color='inherit' component={Link} to='/users'>
+            Users
+          </Button>
+        </Box>
+
+        {/* Right side user + logout */}
+        {user && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant='body1'>{user.name} logged in</Typography>
+            <Button color='inherit' onClick={handleLogout}>
+              Logout
+            </Button>
+          </Box>
+        )}
+      </Toolbar>
+    </AppBar>
   )
 }
 
