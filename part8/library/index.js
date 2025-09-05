@@ -114,7 +114,8 @@ const typeDefs = `
   }
 
   type Mutation {
-    addBook(title:String!, author:String!, published:Int!, genres:[String!]!):Book
+    addBook(title:String!, author:String!, published:Int!, genres:[String!]!):Book,
+    editAuthor(name:String!, setBornTo:Int!):Author
   }
 `
 
@@ -141,13 +142,18 @@ const resolvers = {
     addBook: (root, args) => {
       const book = { ...args, id: uuid() }
 
-      if (!authors.find((author) => author.author === args.author)) {
+      if (!authors.find((author) => author.name === args.author)) {
         const author = { name: args.author, id: uuid() }
         authors = authors.concat(author)
       }
 
       books = books.concat(book)
       return book
+    },
+    editAuthor: (root, args) => {
+      const author = authors.find((author) => author.name === args.name)
+      author.born = args.setBornTo
+      return author
     },
   },
 }
