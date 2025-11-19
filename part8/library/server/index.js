@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 const Author = require('./models/author')
 const Book = require('./models/book')
+const { GraphQLError } = require('graphql')
 
 require('dotenv').config()
 
@@ -82,7 +83,17 @@ const resolvers = {
 
       if (!author) {
         author = new Author({ name: args.author })
-        await author.save()
+        try {
+          await author.save()
+        } catch (error) {
+          throw new GraphQLError('Saving author failed', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              invalidArgs: args.author,
+              error,
+            },
+          })
+        }
       }
 
       const book = new Book({
@@ -92,7 +103,19 @@ const resolvers = {
         genres: args.genres,
       })
 
-      return (await book.save()).populate('author')
+      try {
+        await book.save()
+      } catch (error) {
+        throw new GraphQLError('Saving book failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error,
+          },
+        })
+      }
+
+      return book.populate('author')
     },
     editAuthor: async (root, args) => {
       const author = await Author.findOne({ name: args.name })
