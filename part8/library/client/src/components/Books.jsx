@@ -3,32 +3,31 @@ import { ALL_BOOKS } from '../queries'
 import { useState } from 'react'
 
 const Books = () => {
-  const result = useQuery(ALL_BOOKS)
+  const [selectedGenre, setSelectedGenre] = useState('')
+  const filteredBooksQuery = useQuery(ALL_BOOKS, {
+    variables: { genre: selectedGenre || undefined },
+  })
+  const allBooksQuery = useQuery(ALL_BOOKS)
 
-  const [genre, setGenre] = useState('')
-
-  if (result.loading) {
+  if (allBooksQuery.loading || filteredBooksQuery.loading) {
     return <div>loading...</div>
   }
 
-  const books = result.data.allBooks
+  const filteredBooks = filteredBooksQuery.data.allBooks
+  const allBooks = allBooksQuery.data.allBooks
 
   const getUniqueGenres = () => {
-    const allGenres = books.flatMap((book) => book.genres)
+    const allGenres = allBooks.flatMap((book) => book.genres)
     return [...new Set(allGenres)]
   }
-
-  const filteredBooks = genre
-    ? books.filter((book) => book.genres.includes(genre))
-    : books
 
   return (
     <div>
       <h2>books</h2>
 
-      {genre ? (
+      {selectedGenre ? (
         <p>
-          in genre <b>{genre}</b>
+          in genre <b>{selectedGenre}</b>
         </p>
       ) : null}
 
@@ -52,12 +51,12 @@ const Books = () => {
         {getUniqueGenres().map((genre) => (
           <button
             value={genre}
-            onClick={({ target }) => setGenre(target.value)}
+            onClick={({ target }) => setSelectedGenre(target.value)}
           >
             {genre}
           </button>
         ))}
-        <button onClick={() => setGenre('')}>all genres</button>
+        <button onClick={() => setSelectedGenre('')}>all genres</button>
       </div>
     </div>
   )
