@@ -21,6 +21,11 @@ const Books = () => {
     return [...new Set(allGenres)]
   }
 
+  const handleGenreSelect = async (genreValue) => {
+    setSelectedGenre(genreValue)
+    await allBooksQuery.refetch()
+  }
+
   return (
     <div>
       <h2>books</h2>
@@ -49,14 +54,11 @@ const Books = () => {
       </table>
       <div>
         {getUniqueGenres().map((genre) => (
-          <button
-            value={genre}
-            onClick={({ target }) => setSelectedGenre(target.value)}
-          >
+          <button key={genre} onClick={() => handleGenreSelect(genre)}>
             {genre}
           </button>
         ))}
-        <button onClick={() => setSelectedGenre('')}>all genres</button>
+        <button onClick={() => handleGenreSelect('')}>all genres</button>
       </div>
     </div>
   )
