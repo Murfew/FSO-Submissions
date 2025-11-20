@@ -3,8 +3,10 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
-import { useState } from 'react'
-import { useApolloClient } from '@apollo/client/react'
+import { useState, useEffect } from 'react'
+import { useApolloClient, useQuery } from '@apollo/client/react'
+import { ME } from './queries'
+import Recommend from './components/Recommend'
 
 const App = () => {
   const [token, setToken] = useState(null)
@@ -30,6 +32,11 @@ const App = () => {
             <button>add book</button>
           </Link>
         ) : null}
+        {token ? (
+          <Link to='/recommend'>
+            <button>recommend</button>
+          </Link>
+        ) : null}
         {!token ? (
           <Link to='/login'>
             <button>login</button>
@@ -43,6 +50,7 @@ const App = () => {
         <Route path='/books' element={<Books />} />
         <Route path='/newBook' element={<NewBook />} />
         <Route path='/login' element={<LoginForm setToken={setToken} />} />
+        <Route path='/recommend' element={<Recommend />} />
       </Routes>
     </div>
   )
