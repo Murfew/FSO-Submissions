@@ -44,7 +44,29 @@ const start = async () => {
   })
 
   const schema = makeExecutableSchema({ typeDefs, resolvers })
-  const serverCleanup = useServer({ schema }, wsServer)
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: async (ctx, msg, args) => {
+        // For subscriptions, we can access connection params
+        const token = ctx.connectionParams?.authorization
+        if (token && token.startsWith('Bearer ')) {
+          try {
+            const decodedToken = jwt.verify(
+              token.substring(7),
+              process.env.JWT_SECRET
+            )
+            const currentUser = await User.findById(decodedToken.id)
+            return { currentUser }
+          } catch (error) {
+            return {}
+          }
+        }
+        return {}
+      },
+    },
+    wsServer
+  )
 
   const server = new ApolloServer({
     schema,
