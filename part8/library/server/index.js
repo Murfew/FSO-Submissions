@@ -9,6 +9,7 @@ const cors = require('cors')
 const http = require('http')
 const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/use/ws')
+const { DataLoader } = require('dataloader')
 
 require('dotenv').config()
 
@@ -17,9 +18,32 @@ const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 
 const User = require('./models/user')
+const Book = require('./models/book')
 
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
+
+// DataLoader batch function for counting books by author
+const batchBookCounts = async (authorIds) => {
+  // This function receives an array of author IDs that need their book counts
+  // It must return an array of results in the same order as the input IDs
+
+  // Use MongoDB aggregation to count books grouped by author in a single query
+  const bookCounts = await Book.aggregate([
+    { $match: { author: { $in: authorIds } } }, // Filter books by the requested author IDs
+    { $group: { _id: '$author', count: { $sum: 1 } } }, // Group by author and count
+  ])
+
+  // Create a map for quick lookup: authorId -> count
+  const countMap = {}
+  bookCounts.forEach((result) => {
+    countMap[result._id.toString()] = result.count
+  })
+
+  // Return counts in the same order as the input authorIds
+  // If an author has no books, return 0
+  return authorIds.map((id) => countMap[id.toString()] || 0)
+}
 
 const MONGODB_URI = process.env.MONGODB_URI
 
@@ -99,7 +123,13 @@ const start = async () => {
             process.env.JWT_SECRET
           )
           const currentUser = await User.findById(decodedToken.id)
-          return { currentUser }
+          return {
+            currentUser,
+            bookCountLoader: new DataLoader(batchBookCounts),
+          }
+        }
+        return {
+          bookCountLoader: new DataLoader(batchBookCounts),
         }
       },
     })
