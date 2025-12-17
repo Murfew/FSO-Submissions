@@ -6,18 +6,34 @@ import LoginForm from './components/LoginForm'
 import { useState } from 'react'
 import { useApolloClient, useSubscription } from '@apollo/client/react'
 import Recommend from './components/Recommend'
-import { BOOK_ADDED } from './queries'
+import { BOOK_ADDED, ALL_BOOKS } from './queries'
+
+export const updateBookCache = (cache, query, addedBook) => {
+  // helper that is used to eliminate saving same book twice
+  const uniqByTitle = (a) => {
+    let seen = new Set()
+    return a.filter((item) => {
+      let k = item.title
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+
+  cache.updateQuery(query, (data) => {
+    if (!data || !data.allBooks) return data
+    return {
+      allBooks: uniqByTitle(data.allBooks.concat(addedBook)),
+    }
+  })
+}
 
 const App = () => {
   const [token, setToken] = useState(null)
   const client = useApolloClient()
 
   useSubscription(BOOK_ADDED, {
-    onData: ({ data }) => {
+    onData: ({ data, client }) => {
       const addedBook = data.data.bookAdded
-      window.alert(
-        `New book added: ${addedBook.title} by ${addedBook.author.name}`
-      )
+      updateBookCache(client.cache, { query: ALL_BOOKS }, addedBook)
     },
   })
 
