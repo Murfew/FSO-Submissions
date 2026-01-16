@@ -28,7 +28,7 @@ const parseArguments = (args: string[]): ExerciseValues => {
   };
 };
 
-const analyze = (exerciseData: number[], target: number): Result => {
+export const analyzeExercise = (exerciseData: number[], target: number): Result => {
   const periodLength = exerciseData.length;
   const trainingDays = exerciseData.filter((day) => day !== 0).length;
   const average = exerciseData.reduce((acc, cur) => acc + cur) / periodLength;
@@ -48,13 +48,15 @@ const analyze = (exerciseData: number[], target: number): Result => {
   };
 };
 
-try {
-  const { exerciseData, target } = parseArguments(process.argv);
-  console.log(analyze(exerciseData, target));
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened.';
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
+if (require.main === module) {
+  try {
+    const { exerciseData, target } = parseArguments(process.argv);
+    console.log(analyzeExercise(exerciseData, target));
+  } catch (error: unknown) {
+    let errorMessage = 'Something bad happened.';
+    if (error instanceof Error) {
+      errorMessage += ' Error: ' + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
