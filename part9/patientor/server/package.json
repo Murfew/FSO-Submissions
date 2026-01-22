@@ -1,17 +1,17 @@
 {
-  "name": "patientor",
+  "name": "newserver",
   "version": "1.0.0",
   "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "dev": "ts-node-dev index.ts",
-    "lint": "eslint .",
-    "start": "node build/index.js"
+    "dev": "ts-node-dev ./src/index.ts",
+    "lint": "eslint ."
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@stylistic/eslint-plugin": "^5.7.0",
