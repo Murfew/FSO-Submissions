@@ -25,6 +25,7 @@ export const Visibility = {
 
 export type Visibility = typeof Visibility[keyof typeof Visibility]
 
+export type NewDiaryEntry = Omit<DiaryEntry, 'id'>;
 
 export interface EntriesProps {
   entries: DiaryEntry[]
@@ -32,4 +33,8 @@ export interface EntriesProps {
 
 export interface EntryProps {
   entry: DiaryEntry
+}
+
+export interface NewEntryFormProps {
+  handleNewEntry: (entry: DiaryEntry) => void
 }
