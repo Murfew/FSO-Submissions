@@ -7,13 +7,18 @@ const NewEntryForm = (props: NewEntryFormProps) => {
   const [visibility, setVisibility] = useState('' as Visibility)
   const [weather, setWeather] = useState('' as Weather)
   const [comment, setComment] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const addEntry = async (event: React.SyntheticEvent) => {
     event.preventDefault()
 
-    const newEntry = await createDiaryEntry({date, visibility, weather, comment})
+    try {
+      const newEntry = await createDiaryEntry({date, visibility, weather, comment})
 
-    props.handleNewEntry(newEntry)
+      props.handleNewEntry(newEntry)
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unexpected error')
+    }
 
     setDate('')
     setVisibility('' as Visibility)
@@ -24,6 +29,9 @@ const NewEntryForm = (props: NewEntryFormProps) => {
   return (
     <div>
       <h3>Add new entry</h3>
+      {errorMessage && (
+        <p style={{ color: 'red' }}>{errorMessage}</p>
+      )}
       <form onSubmit={addEntry}>
         <span style={{display:'block'}}>
           date <input type="text" value={date} onChange={(event) => setDate(event.target.value)}/>

@@ -3,6 +3,8 @@ import type { DiaryEntry, NewDiaryEntry } from '../types.ts'
 
 const baseUrl = 'http://localhost:3001/api/diaries'
 
+type ErrorResponse = {error: string}
+
 export const getAllDiaryEntries = async () => {
   const response = await axios
     .get<DiaryEntry[]>(baseUrl);
@@ -10,6 +12,13 @@ export const getAllDiaryEntries = async () => {
 }
 
 export const createDiaryEntry = async (object: NewDiaryEntry) => {
-  const response = await axios.post<DiaryEntry>(baseUrl, object)
-  return response.data
+  try {
+    const response = await axios.post<DiaryEntry>(baseUrl, object)
+    return response.data
+  } catch (error) {
+    if (axios.isAxiosError<ErrorResponse>(error)) {
+      throw new Error(error.response?.data?.error ?? "Request failed")
+    }
+    throw new Error("Unexpected error")
+  }
 }
