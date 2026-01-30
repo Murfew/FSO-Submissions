@@ -4,6 +4,7 @@ import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import { useEffect, useState } from "react";
 import diagnosesService from '../../services/diagnoses';
+import EntryDetails from "./EntryDetails";
 
 interface Props {
   patient: Patient | undefined
@@ -38,20 +39,7 @@ const PatientPage = ({patient} : Props) => {
       </Box>
       <Typography variant="h6" sx={{fontWeight: 'bold'}}>entries</Typography>
       {patient.entries.map((entry) => (
-        <Box key={entry.id} sx={{}}>
-          <Typography>{entry.date}</Typography>
-          { }
-          <Typography sx={{fontStyle: 'italic'}}>{entry.description}</Typography>  
-          {entry.diagnosisCodes && 
-            <ul>
-              {entry.diagnosisCodes.map((code) => (
-                <li key={code}>
-                  <Typography>{code} {diagnoses.filter((diagnosis) => diagnosis.code === code)[0].name}</Typography>
-                </li>
-              ))}
-            </ul>
-          }
-        </Box>
+        <EntryDetails entry={entry} diagnosesInfo={diagnoses}/>
       ))}
     </Box>
   );
