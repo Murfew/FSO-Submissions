@@ -1,13 +1,25 @@
-import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
-import { Gender, Patient } from "../../types";
+import { Box, Typography } from "@mui/material";
+import { Diagnosis, Gender, Patient } from "../../types";
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
+import { useEffect, useState } from "react";
+import diagnosesService from '../../services/diagnoses';
 
 interface Props {
   patient: Patient | undefined
 }
 
 const PatientPage = ({patient} : Props) => {
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
+
+   useEffect(() => {
+    const fetchDiagnosisList = async () => {
+      const diagnoses = await diagnosesService.getAll();
+      setDiagnoses(diagnoses);
+    };
+    void fetchDiagnosisList();
+  }, []);
+
   if (!patient) {
     return (
       <Box>
@@ -34,7 +46,7 @@ const PatientPage = ({patient} : Props) => {
             <ul>
               {entry.diagnosisCodes.map((code) => (
                 <li key={code}>
-                  <Typography>{code}</Typography>
+                  <Typography>{code} {diagnoses.filter((diagnosis) => diagnosis.code === code)[0].name}</Typography>
                 </li>
               ))}
             </ul>
