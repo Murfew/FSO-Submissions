@@ -13,7 +13,7 @@ export interface NewPatient {
   gender: Gender;
   occupation: string;
 }
-export interface Patient extends Omit<NewPatient, "entries"> {
+export interface Patient extends NewPatient {
   id: string;
   entries: Entry[];
 }
