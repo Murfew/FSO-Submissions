@@ -1,20 +1,33 @@
-import { Alert, Box, Button, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import patientService from '../../services/patients';
-import { NewEntry, HealthCheckRating, Entry } from "../../types";
+import { NewEntry, HealthCheckRating, Entry, Diagnosis } from "../../types";
 import axios from "axios";
+import { Dayjs } from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers";
 
 interface Props {
   patientId: string;
   onEntryAdded: (patientId: string, entry: Entry) => void;
-
+  diagnosisInfo: Diagnosis[]
 }
 
-const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const HealthCheckEntryForm = ({patientId, onEntryAdded, diagnosisInfo}: Props) => {
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState<Dayjs | null>(null);
   const [specialist, setSpecialist] = useState('');
-  const [healthCheckRating, setHealthCheckRating] = useState('');
+  const [healthCheckRating, setHealthCheckRating] = useState<HealthCheckRating | null>(null);
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [error, setError] = useState('');
 
@@ -24,9 +37,9 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
       const newEntry: NewEntry = {
         type: "HealthCheck",
         description,
-        date,
+        date: date!.format('YYYY-MM-DD'),
         specialist,
-        healthCheckRating: Number(healthCheckRating) as HealthCheckRating,
+        healthCheckRating: healthCheckRating!,
         diagnosisCodes,
       };
 
@@ -51,9 +64,9 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
 
   const resetForm = () => {
     setDescription('');
-    setDate('');
+    setDate(null);
     setSpecialist('');
-    setHealthCheckRating('');
+    setHealthCheckRating(null);
     setDiagnosisCodes([]);
   };
 
@@ -71,40 +84,62 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
         >
           <Typography variant="h6" sx={{fontWeight: "bold"}}>New HealthCheck Entry</Typography>
           <TextField 
-            variant="standard" 
+            variant="outlined" 
             label="Description" 
             value={description} 
             onChange={(e) => setDescription(e.target.value)}
             required
           />
-          <TextField 
-            variant="standard" 
+          <DatePicker 
             label="Date" 
             value={date} 
-            onChange={(e) => setDate(e.target.value)}
-            required
+            onChange={(e) => setDate(e)}
+            slotProps={{
+              textField: {
+                required: true
+              }
+            }}
           />
           <TextField 
-            variant="standard" 
+            variant="outlined" 
             label="Specialist" 
             value={specialist} 
             onChange={(e) => setSpecialist(e.target.value)}
             required
           />
           <TextField 
-            variant="standard" 
+            variant="outlined" 
+            type="number"
             label="HealthCheck rating" 
             value={healthCheckRating} 
-            onChange={(e) => setHealthCheckRating(e.target.value)}
+            onChange={(e) => setHealthCheckRating(Number(e.target.value))}
             required
+            inputProps={{
+              min: 0,
+              max: 3,
+              step: 1,
+            }}
           />
-          <TextField 
-            variant="standard" 
-            label="Diagnosis codes" 
-            value={diagnosisCodes} 
-            onChange={(e) => setDiagnosisCodes(e.target.value.split(',').map(code => code.trim()))}
-            required
-          />
+          <FormControl fullWidth>
+            <InputLabel id="diagnosis-codes-label">Diagnosis codes</InputLabel>
+            <Select
+              labelId="diagnosis-codes-label"
+              label="Diagnosis codes"
+              multiple
+              value={diagnosisCodes}
+              onChange={(e) => setDiagnosisCodes(e.target.value as string[])}
+              MenuProps={MenuProps}
+            >
+              {diagnosisInfo.map(code => (
+                <MenuItem
+                  key={code.code}
+                  value={code.code}
+                >
+                  {code.code}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           <Box display="flex" justifyContent="space-between">
             <Button variant="contained" color="error" onClick={resetForm}>Cancel</Button>

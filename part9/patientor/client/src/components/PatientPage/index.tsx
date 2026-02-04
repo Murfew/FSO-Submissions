@@ -76,6 +76,7 @@ const PatientPage = ({patient, onEntryAdded} : Props) => {
         <HealthCheckEntryForm
           patientId={patient.id}
           onEntryAdded={onEntryAdded}
+          diagnosisInfo={diagnoses}
         />
       )}
 
@@ -83,6 +84,7 @@ const PatientPage = ({patient, onEntryAdded} : Props) => {
         <HospitalEntryForm
           patientId={patient.id}
           onEntryAdded={onEntryAdded}
+          diagnosisInfo={diagnoses}
         />
       )}
 
@@ -90,6 +92,7 @@ const PatientPage = ({patient, onEntryAdded} : Props) => {
         <OccupationalHealthcareEntryForm
           patientId={patient.id}
           onEntryAdded={onEntryAdded}
+          diagnosisInfo={diagnoses}
         />
       )}
 

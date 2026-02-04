@@ -1,23 +1,36 @@
-import { Alert, Box, Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import patientService from '../../services/patients';
-import { NewEntry, Entry } from "../../types";
+import { NewEntry, Entry, Diagnosis } from "../../types";
 import axios from "axios";
+import { DatePicker } from "@mui/x-date-pickers";
+import { Dayjs } from "dayjs";
 
 interface Props {
   patientId: string;
   onEntryAdded: (patientId: string, entry: Entry) => void;
-
+  diagnosisInfo: Diagnosis[]
 }
 
-const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded}: Props) => {
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded, diagnosisInfo}: Props) => {
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState<Dayjs | null>(null);
   const [specialist, setSpecialist] = useState('');
   const [employerName, setEmployerName] = useState('');
   const [sickLeaveEnabled, setSickLeaveEnabled] = useState(false);
-  const [sickLeaveStartDate, setSickLeaveStartDate] = useState('');
-  const [sickLeaveEndDate, setSickLeaveEndDate] = useState('');
+  const [sickLeaveStartDate, setSickLeaveStartDate] = useState<Dayjs | null>(null);
+  const [sickLeaveEndDate, setSickLeaveEndDate] = useState<Dayjs | null>(null);
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [error, setError] = useState('');
 
@@ -27,14 +40,14 @@ const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded}: Props) => {
       const newEntry: NewEntry = {
         type: "OccupationalHealthcare",
         description,
-        date,
+        date: date!.format('YYYY-MM-DD'),
         specialist,
         employerName,
         ...(sickLeaveEnabled
           ? { sickLeave: 
               { 
-                startDate: sickLeaveStartDate, 
-                endDate: sickLeaveEndDate 
+                startDate: sickLeaveStartDate!.format('YYYY-MM-DD'), 
+                endDate: sickLeaveEndDate!.format('YYYY-MM-DD') 
               } 
             }
           : {}),
@@ -62,12 +75,12 @@ const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded}: Props) => {
 
   const resetForm = () => {
     setDescription('');
-    setDate('');
+    setDate(null);
     setSpecialist('');
     setEmployerName('');
     setSickLeaveEnabled(false);
-    setSickLeaveStartDate('');
-    setSickLeaveEndDate('');
+    setSickLeaveStartDate(null);
+    setSickLeaveEndDate(null);
     setDiagnosisCodes([]);
   };
 
@@ -85,28 +98,31 @@ const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded}: Props) => {
         >
           <Typography variant="h6" sx={{fontWeight: "bold"}}>New Occupational Healthcare Entry</Typography>
           <TextField 
-            variant="standard" 
+            variant="outlined" 
             label="Description" 
             value={description} 
             onChange={(e) => setDescription(e.target.value)}
             required
           />
-          <TextField 
-            variant="standard" 
+          <DatePicker 
             label="Date" 
             value={date} 
-            onChange={(e) => setDate(e.target.value)}
-            required
+            onChange={(e) => setDate(e)}
+            slotProps={{
+              textField: {
+                required: true
+              }
+            }}
           />
           <TextField 
-            variant="standard" 
+            variant="outlined" 
             label="Specialist" 
             value={specialist} 
             onChange={(e) => setSpecialist(e.target.value)}
             required
           />
           <TextField 
-            variant="standard" 
+            variant="outlined" 
             label="Employer name" 
             value={employerName} 
             onChange={(e) => setEmployerName(e.target.value)}
@@ -121,30 +137,49 @@ const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded}: Props) => {
             label="Sick leave" 
           />
           {sickLeaveEnabled && (
-            <TextField 
-              variant="standard" 
+            <DatePicker 
               label="Sick leave start date" 
               value={sickLeaveStartDate} 
-              onChange={(e) => setSickLeaveStartDate(e.target.value)}
-              required
+              onChange={(e) => setSickLeaveStartDate(e)}
+              slotProps={{
+                textField: {
+                  required: true
+                }
+              }}
             />
           )}
           {sickLeaveEnabled && (
-            <TextField 
-              variant="standard" 
+            <DatePicker 
               label="Sick leave end date" 
               value={sickLeaveEndDate} 
-              onChange={(e) => setSickLeaveEndDate(e.target.value)}
-              required
+              onChange={(e) => setSickLeaveEndDate(e)}
+              slotProps={{
+                textField: {
+                  required: true
+                }
+              }}
             />
           )}
-          <TextField 
-            variant="standard" 
-            label="Diagnosis codes" 
-            value={diagnosisCodes} 
-            onChange={(e) => setDiagnosisCodes(e.target.value.split(',').map(code => code.trim()))}
-            required
-          />
+          <FormControl fullWidth>
+            <InputLabel id="diagnosis-codes-label">Diagnosis codes</InputLabel>
+            <Select
+              labelId="diagnosis-codes-label"
+              label="Diagnosis codes"
+              multiple
+              value={diagnosisCodes}
+              onChange={(e) => setDiagnosisCodes(e.target.value as string[])}
+              MenuProps={MenuProps}
+            >
+              {diagnosisInfo.map(code => (
+                <MenuItem
+                  key={code.code}
+                  value={code.code}
+                >
+                  {code.code}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           <Box display="flex" justifyContent="space-between">
             <Button variant="contained" color="error" onClick={resetForm}>Cancel</Button>
