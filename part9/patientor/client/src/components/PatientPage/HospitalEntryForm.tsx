@@ -1,7 +1,7 @@
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import patientService from '../../services/patients';
-import { NewEntry, HealthCheckRating, Entry } from "../../types";
+import { NewEntry, Entry } from "../../types";
 import axios from "axios";
 
 interface Props {
@@ -10,11 +10,12 @@ interface Props {
 
 }
 
-const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
+const HospitalEntryForm = ({patientId, onEntryAdded}: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
-  const [healthCheckRating, setHealthCheckRating] = useState('');
+  const [dischargeDate, setDischargeDate] = useState('');
+  const [dischargeCriteria, setDischargeCriteria] = useState('');
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [error, setError] = useState('');
 
@@ -22,11 +23,14 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
       event.preventDefault();
 
       const newEntry: NewEntry = {
-        type: "HealthCheck",
+        type: "Hospital",
         description,
         date,
         specialist,
-        healthCheckRating: Number(healthCheckRating) as HealthCheckRating,
+        discharge: {
+          date: dischargeDate,
+          criteria: dischargeCriteria
+        },
         diagnosisCodes,
       };
 
@@ -53,7 +57,8 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
     setDescription('');
     setDate('');
     setSpecialist('');
-    setHealthCheckRating('');
+    setDischargeDate('');
+    setDischargeCriteria('');
     setDiagnosisCodes([]);
   };
 
@@ -69,7 +74,7 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
           gap={2}
           p={2}
         >
-          <Typography variant="h6" sx={{fontWeight: "bold"}}>New HealthCheck Entry</Typography>
+          <Typography variant="h6" sx={{fontWeight: "bold"}}>New Hospital Entry</Typography>
           <TextField 
             variant="standard" 
             label="Description" 
@@ -93,9 +98,16 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
           />
           <TextField 
             variant="standard" 
-            label="HealthCheck rating" 
-            value={healthCheckRating} 
-            onChange={(e) => setHealthCheckRating(e.target.value)}
+            label="Discharge date" 
+            value={dischargeDate} 
+            onChange={(e) => setDischargeDate(e.target.value)}
+            required
+          />
+          <TextField 
+            variant="standard" 
+            label="Discharge criteria" 
+            value={dischargeCriteria} 
+            onChange={(e) => setDischargeCriteria(e.target.value)}
             required
           />
           <TextField 
@@ -115,4 +127,4 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
   );
 };
 
-export default HealthCheckEntryForm;
+export default HospitalEntryForm;

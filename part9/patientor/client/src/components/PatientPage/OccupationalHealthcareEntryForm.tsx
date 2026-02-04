@@ -1,7 +1,7 @@
-import { Alert, Box, Button, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import patientService from '../../services/patients';
-import { NewEntry, HealthCheckRating, Entry } from "../../types";
+import { NewEntry, Entry } from "../../types";
 import axios from "axios";
 
 interface Props {
@@ -10,11 +10,14 @@ interface Props {
 
 }
 
-const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
+const OccupationalHealthcareEntryForm = ({patientId, onEntryAdded}: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
-  const [healthCheckRating, setHealthCheckRating] = useState('');
+  const [employerName, setEmployerName] = useState('');
+  const [sickLeaveEnabled, setSickLeaveEnabled] = useState(false);
+  const [sickLeaveStartDate, setSickLeaveStartDate] = useState('');
+  const [sickLeaveEndDate, setSickLeaveEndDate] = useState('');
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [error, setError] = useState('');
 
@@ -22,11 +25,19 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
       event.preventDefault();
 
       const newEntry: NewEntry = {
-        type: "HealthCheck",
+        type: "OccupationalHealthcare",
         description,
         date,
         specialist,
-        healthCheckRating: Number(healthCheckRating) as HealthCheckRating,
+        employerName,
+        ...(sickLeaveEnabled
+          ? { sickLeave: 
+              { 
+                startDate: sickLeaveStartDate, 
+                endDate: sickLeaveEndDate 
+              } 
+            }
+          : {}),
         diagnosisCodes,
       };
 
@@ -53,7 +64,10 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
     setDescription('');
     setDate('');
     setSpecialist('');
-    setHealthCheckRating('');
+    setEmployerName('');
+    setSickLeaveEnabled(false);
+    setSickLeaveStartDate('');
+    setSickLeaveEndDate('');
     setDiagnosisCodes([]);
   };
 
@@ -69,7 +83,7 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
           gap={2}
           p={2}
         >
-          <Typography variant="h6" sx={{fontWeight: "bold"}}>New HealthCheck Entry</Typography>
+          <Typography variant="h6" sx={{fontWeight: "bold"}}>New Occupational Healthcare Entry</Typography>
           <TextField 
             variant="standard" 
             label="Description" 
@@ -93,11 +107,37 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
           />
           <TextField 
             variant="standard" 
-            label="HealthCheck rating" 
-            value={healthCheckRating} 
-            onChange={(e) => setHealthCheckRating(e.target.value)}
+            label="Employer name" 
+            value={employerName} 
+            onChange={(e) => setEmployerName(e.target.value)}
             required
           />
+          <FormControlLabel 
+            control={
+              <Checkbox 
+                checked={sickLeaveEnabled} 
+                onChange={(e) => setSickLeaveEnabled(e.target.checked)}
+              />} 
+            label="Sick leave" 
+          />
+          {sickLeaveEnabled && (
+            <TextField 
+              variant="standard" 
+              label="Sick leave start date" 
+              value={sickLeaveStartDate} 
+              onChange={(e) => setSickLeaveStartDate(e.target.value)}
+              required
+            />
+          )}
+          {sickLeaveEnabled && (
+            <TextField 
+              variant="standard" 
+              label="Sick leave end date" 
+              value={sickLeaveEndDate} 
+              onChange={(e) => setSickLeaveEndDate(e.target.value)}
+              required
+            />
+          )}
           <TextField 
             variant="standard" 
             label="Diagnosis codes" 
@@ -115,4 +155,4 @@ const HealthCheckEntryForm = ({patientId, onEntryAdded}: Props) => {
   );
 };
 
-export default HealthCheckEntryForm;
+export default OccupationalHealthcareEntryForm;
