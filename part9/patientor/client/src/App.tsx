@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Route, Link, Routes, useMatch } from "react-router-dom";
+import { Route, Link, Routes, useMatch } from "react-router-dom";
 import { Button, Divider, Container, Typography } from '@mui/material';
 
 import { apiBaseUrl } from "./constants";
-import { Patient } from "./types";
+import { Entry, Patient } from "./types";
 
 import patientService from "./services/patients";
 import PatientListPage from "./components/PatientListPage";
@@ -25,6 +25,14 @@ const App = () => {
 
   const matchPatient = useMatch('/patients/:id');
   const patient = matchPatient ? patients.find(patient => patient.id === matchPatient.params.id) : undefined;
+
+  const addEntryToPatient = (patientId: string, entry: Entry) => {
+    setPatients((prev) =>
+      prev.map((p) =>
+        p.id === patientId ? { ...p, entries: p.entries.concat(entry) } : p
+      )
+    );
+  };
   
   return (
     <div className="App">
@@ -38,7 +46,7 @@ const App = () => {
           <Divider hidden />
           <Routes>
             <Route path="/" element={<PatientListPage patients={patients} setPatients={setPatients} />} />
-            <Route path="/patients/:id" element={<PatientPage patient={patient}/>}/>
+            <Route path="/patients/:id" element={<PatientPage patient={patient} onEntryAdded={addEntryToPatient}/>}/>
           </Routes>
         </Container>
     </div>

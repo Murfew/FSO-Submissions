@@ -7,7 +7,7 @@ interface Props {
 }
 
 const getName = (code: string, diagnosesInfo: Diagnosis[]) =>
-  diagnosesInfo.find((d) => d.code === code)?.name ?? code;
+  diagnosesInfo.find((d) => d.code === code)?.name ?? 'Unknown diagnosis';
 
 const DiagnosisList = ({ diagnosisCodes, diagnosesInfo }: Props) => {
   if (!diagnosisCodes?.length) return null;
