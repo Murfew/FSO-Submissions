@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { Blog } from '../models/index.js'
+import blogFinder from '../middleware/blogFinder.js';
+import { httpError } from '../util/httpError.js';
 
 const router = Router();
 
@@ -9,39 +11,33 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  try {
-    const blog = await Blog.create(req.body)
-    return res.json(blog) 
-  } catch (error) {
-    return res.status(400).json({error: error.message})
+  const { author, title, url, likes } = req.body
+
+  if (!title || !url) {
+    throw httpError('title and url are required', 400)
   }
+
+  const blog = await Blog.create({ author, title, url, likes })
+  res.status(201).json(blog)
 })
 
-router.delete('/:id', async (req, res) => {
-  const deletedCount = await Blog.destroy({
-    where: {
-      id: req.params.id
-    }
-  })
+router.delete('/:id', blogFinder, async (req, res) => {
+  await req.blog.destroy()
 
-  if (deletedCount === 0) {
-    return res.status(404).json({ error: 'blog not found' })
-  }
-  
   return res.status(204).end()
 })
 
-router.put('/:id', async (req, res) => {
-  const blog = await Blog.findByPk(req.params.id)
+router.put('/:id', blogFinder, async (req, res) => {
+  const { likes } = req.body
 
-  if (!blog) {
-    return res.status(404).end()
+  if (typeof likes !== 'number') {
+    throw httpError('likes must be a number', 400)
   }
 
-  blog.likes = req.body.likes
-  await blog.save()
+  req.blog.likes = likes
+  await req.blog.save()
 
-  res.json({ likes: blog.likes })
+  return res.json(req.blog)
 })
 
 export default router
