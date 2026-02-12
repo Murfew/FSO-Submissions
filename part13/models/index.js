@@ -1,7 +1,7 @@
-import Blog from './blog'
+import Blog from './blog.js'
 
 Blog.sync()
 
-export default {
+export {
   Blog
 }

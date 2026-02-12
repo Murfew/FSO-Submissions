@@ -1,9 +1,16 @@
 import Sequelize from 'sequelize'
-import { DATABASE_URL } from './config'
+import { DATABASE_URL } from './config.js'
 
-const sequelize = new Sequelize(DATABASE_URL)
+export const sequelize = new Sequelize(DATABASE_URL, {
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+})
 
-const connectToDatabase = async () => {
+export const connectToDatabase = async () => {
   try {
     await sequelize.authenticate()
     console.log('connected to the database')
@@ -15,4 +22,4 @@ const connectToDatabase = async () => {
   return null
 }
 
-export default { connectToDatabase, sequelize }
+

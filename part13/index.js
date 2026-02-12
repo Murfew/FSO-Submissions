@@ -1,7 +1,7 @@
 import express, { json } from 'express'
-import { PORT } from './util/config'
-import { connectToDatabase } from './util/db'
-import blogsRouter from './controllers/blogs'
+import { PORT } from './util/config.js'
+import { connectToDatabase } from './util/db.js'
+import blogsRouter from './controllers/blogs.js'
 
 const app = express()
 
