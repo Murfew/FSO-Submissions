@@ -24,9 +24,12 @@ router.post('/', tokenExtractor, async (req, res) => {
   return res.status(201).json(blog)
 })
 
-router.delete('/:id', blogFinder, async (req, res) => {
-  await req.blog.destroy()
+router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
+  if (req.blog.userId !== req.decodedToken.id) {
+    throw httpError('forbidden', 403)
+  }
 
+  await req.blog.destroy()
   return res.status(204).end()
 })
 
