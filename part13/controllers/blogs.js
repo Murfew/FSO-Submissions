@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router } from 'express'
 import { Blog } from '../models/index.js'
-import blogFinder from '../middleware/blogFinder.js';
-import { httpError } from '../util/httpError.js';
+import blogFinder from '../middleware/blogFinder.js'
+import { httpError } from '../util/httpError.js'
 
-const router = Router();
+const router = Router()
 
 router.get('/', async (req, res) => {
   const blogs = await Blog.findAll()
@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
   }
 
   const blog = await Blog.create({ author, title, url, likes })
-  res.status(201).json(blog)
+  return res.status(201).json(blog)
 })
 
 router.delete('/:id', blogFinder, async (req, res) => {

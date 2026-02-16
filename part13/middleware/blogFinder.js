@@ -1,12 +1,11 @@
-import { Blog } from "../models/index.js"
+import { Blog } from '../models/index.js'
+import { httpError } from '../util/httpError.js'
 
 const blogFinder = async (req, res, next) => {
   const blog = await Blog.findByPk(req.params.id)
 
   if (!blog) {
-    const err = new Error('blog not found')
-    err.status = 404
-    throw err
+    throw httpError('blog not found', 404)
   }
 
   req.blog = blog
