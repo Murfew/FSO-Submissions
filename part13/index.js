@@ -4,6 +4,7 @@ import { connectToDatabase } from './util/db.js'
 import blogsRouter from './controllers/blogs.js'
 import errorHandler from './middleware/errorHandler.js'
 import userRouter from './controllers/users.js'
+import loginRouter from './controllers/login.js'
 
 const app = express()
 
@@ -11,6 +12,7 @@ app.use(json())
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
 
 app.use(errorHandler)
 
