@@ -29,14 +29,12 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', tokenExtractor, async (req, res) => {
-  const { author, title, url, likes } = req.body
-
-  if (!title || !url) {
+  if (!req.body.title || !req.body.url) {
     throw httpError('title and url are required', 400)
   }
 
   const user = await User.findByPk(req.decodedToken.id)
-  const blog = await Blog.create({ author, title, url, likes, userId: user.id })
+  const blog = await Blog.create({ ...req.body, userId: user.id })
 
   return res.status(201).json(blog)
 })
