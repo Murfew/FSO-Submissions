@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
       [sequelize.fn('COUNT', sequelize.col('title')), 'articles'],
     ],
     group: 'author',
+    order: [['likes', 'DESC']],
   })
 
   return res.json(authors)
