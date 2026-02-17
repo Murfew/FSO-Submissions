@@ -1,11 +1,11 @@
 import express, { json } from 'express'
+import authorRouter from './controllers/authors.js'
+import blogsRouter from './controllers/blogs.js'
+import loginRouter from './controllers/login.js'
+import userRouter from './controllers/users.js'
 import { PORT } from './util/config.js'
 import { connectToDatabase } from './util/db.js'
-import blogsRouter from './controllers/blogs.js'
-import errorHandler from './middleware/errorHandler.js'
-import userRouter from './controllers/users.js'
-import loginRouter from './controllers/login.js'
-import authorRouter from './controllers/authors.js'
+import { errorHandler } from './util/middleware.js'
 
 const app = express()
 

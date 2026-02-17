@@ -1,9 +1,8 @@
 import { Router } from 'express'
-import { Blog, User } from '../models/index.js'
-import blogFinder from '../middleware/blogFinder.js'
-import { httpError } from '../util/httpError.js'
-import tokenExtractor from '../middleware/tokenExtractor.js'
 import { Op } from 'sequelize'
+import { Blog, User } from '../models/index.js'
+import { httpError } from '../util/httpError.js'
+import { blogFinder, tokenExtractor } from '../util/middleware.js'
 
 const router = Router()
 

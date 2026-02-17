@@ -1,7 +1,7 @@
-import { Router } from 'express'
-import { User, Blog } from '../models/index.js'
-import { httpError } from '../util/httpError.js'
 import bcrypt from 'bcrypt'
+import { Router } from 'express'
+import { Blog, User } from '../models/index.js'
+import { httpError } from '../util/httpError.js'
 
 const router = Router()
 

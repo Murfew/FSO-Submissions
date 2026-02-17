@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken'
-import { Router } from 'express'
 import bcrypt from 'bcrypt'
-import { httpError } from '../util/httpError.js'
-import { SECRET } from '../util/config.js'
+import { Router } from 'express'
+import jwt from 'jsonwebtoken'
 import { User } from '../models/index.js'
+import { SECRET } from '../util/config.js'
+import { httpError } from '../util/httpError.js'
 
 const router = Router()
 
