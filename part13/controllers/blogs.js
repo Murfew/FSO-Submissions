@@ -14,10 +14,6 @@ router.get('/', async (req, res) => {
     where.title = {
       [Op.iLike]: `%${req.query.search}%`,
     }
-
-    where.author = {
-      [Op.iLike]: `%${req.query.search}%`,
-    }
   }
 
   const blogs = await Blog.findAll({
