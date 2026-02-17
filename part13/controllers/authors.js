@@ -1,0 +1,20 @@
+import { Router } from 'express'
+import { Blog } from '../models/index.js'
+import { sequelize } from '../util/db.js'
+
+const router = Router()
+
+router.get('/', async (req, res) => {
+  const authors = await Blog.findAll({
+    attributes: [
+      'author',
+      [sequelize.fn('SUM', sequelize.col('likes')), 'likes'],
+      [sequelize.fn('COUNT', sequelize.col('title')), 'articles'],
+    ],
+    group: 'author',
+  })
+
+  return res.json(authors)
+})
+
+export default router
