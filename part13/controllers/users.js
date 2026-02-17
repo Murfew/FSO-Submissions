@@ -1,12 +1,17 @@
 import { Router } from 'express'
-import { User } from '../models/index.js'
+import { User, Blog } from '../models/index.js'
 import { httpError } from '../util/httpError.js'
 import bcrypt from 'bcrypt'
 
 const router = Router()
 
 router.get('/', async (req, res) => {
-  const users = await User.findAll()
+  const users = await User.findAll({
+    include: {
+      model: Blog,
+      attributes: { exclude: ['userId'] },
+    },
+  })
   return res.json(users)
 })
 
