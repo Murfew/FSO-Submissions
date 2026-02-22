@@ -1,0 +1,28 @@
+import { Router } from 'express'
+import { Blog, ReadingList, User } from '../models/index.js'
+import { httpError } from '../util/httpError.js'
+
+const router = Router()
+
+router.post('/', async (req, res) => {
+  if (!req.body.userId || !req.body.blogId) {
+    throw httpError('userId and blogId are required', 400)
+  }
+
+  const user = await User.findByPk(req.body.userId)
+  const blog = await Blog.findByPk(req.body.blogId)
+
+  if (!user) {
+    throw httpError('invalid userId', 400)
+  }
+
+  if (!blog) {
+    throw httpError('invalid blogId', 400)
+  }
+
+  const readingList = await ReadingList.create({ userId: user.id, blogId: blog.id })
+
+  return res.status(201).json(readingList)
+})
+
+export default router

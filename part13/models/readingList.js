@@ -1,4 +1,4 @@
-import { Model } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../util/db.js'
 
 class ReadingList extends Model {}
@@ -29,7 +29,7 @@ ReadingList.init(
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: 'readingList',
+    modelName: 'reading_list',
   },
 )
 

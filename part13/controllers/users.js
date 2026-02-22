@@ -15,6 +15,32 @@ router.get('/', async (req, res) => {
   return res.json(users)
 })
 
+router.get('/:id', async (req, res) => {
+  const user = await User.findByPk(req.params.id, {
+    attributes: { exclude: [''] },
+    include: [
+      {
+        model: Blog,
+        attributes: { exclude: ['userId'] },
+      },
+      {
+        model: Blog,
+        as: 'saved_blogs',
+        attributes: { exclude: ['userId'] },
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  })
+
+  if (!user) {
+    throw httpError('invalid userId', 400)
+  }
+
+  return res.json(user)
+})
+
 router.post('/', async (req, res) => {
   const { username, name, password } = req.body
 
