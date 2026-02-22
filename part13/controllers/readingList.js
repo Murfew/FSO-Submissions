@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { Blog, ReadingList, User } from '../models/index.js'
 import { httpError } from '../util/httpError.js'
+import { tokenExtractor } from '../util/middleware.js'
 
 const router = Router()
 
@@ -23,6 +24,24 @@ router.post('/', async (req, res) => {
   const readingList = await ReadingList.create({ userId: user.id, blogId: blog.id })
 
   return res.status(201).json(readingList)
+})
+
+router.put('/:id', tokenExtractor, async (req, res) => {
+  const entry = await ReadingList.findOne({
+    where: {
+      id: req.params.id,
+      userId: req.decodedToken.id,
+    },
+  })
+
+  if (!entry) {
+    throw httpError('reading list entry not found', 400)
+  }
+
+  entry.hasRead = req.body.hasRead
+  await entry.save()
+
+  res.json(entry)
 })
 
 export default router
