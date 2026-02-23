@@ -14,11 +14,11 @@ router.post('/', async (req, res) => {
   const blog = await Blog.findByPk(req.body.blogId)
 
   if (!user) {
-    throw httpError('invalid userId', 400)
+    throw httpError('no such user', 404)
   }
 
   if (!blog) {
-    throw httpError('invalid blogId', 400)
+    throw httpError('no such blog', 404)
   }
 
   const readingList = await ReadingList.create({ userId: user.id, blogId: blog.id })
@@ -27,21 +27,23 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/:id', tokenExtractor, checkSession, async (req, res) => {
-  const entry = await ReadingList.findOne({
-    where: {
-      id: req.params.id,
-      userId: req.decodedToken.id,
-    },
-  })
+  const entryId = Number(req.params.id)
+  const userId = Number(req.decodedToken.id)
+
+  const entry = await ReadingList.findByPk(entryId)
 
   if (!entry) {
-    throw httpError('reading list entry not found', 400)
+    throw httpError('reading list entry not found', 404)
   }
 
-  entry.hasRead = req.body.hasRead
+  if (Number(entry.userId) !== userId) {
+    throw httpError('can only mark your own reading list entries', 401)
+  }
+
+  entry.read = Boolean(req.body.read)
   await entry.save()
 
-  res.json(entry)
+  return res.status(200).json(entry)
 })
 
 export default router

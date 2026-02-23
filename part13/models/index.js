@@ -6,7 +6,7 @@ import User from './user.js'
 User.hasMany(Blog)
 Blog.belongsTo(User)
 
-User.belongsToMany(Blog, { through: ReadingList, as: 'saved_blogs' })
+User.belongsToMany(Blog, { through: ReadingList, as: 'readings' })
 Blog.belongsToMany(User, { through: ReadingList })
 
 Session.belongsTo(User)

@@ -26,7 +26,7 @@ export const errorHandler = (err, req, res, next) => {
   }
 
   if (err.name === 'SequelizeUniqueConstraintError') {
-    res.status(409).json({ error: err.message })
+    return res.status(400).json({ error: err.message })
   }
 
   return res.status(500).json({ error: 'internal server error' })
