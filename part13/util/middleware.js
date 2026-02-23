@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { Blog } from '../models/index.js'
+import { Blog, Session } from '../models/index.js'
 import { SECRET } from './config.js'
 import { httpError } from './httpError.js'
 
@@ -39,10 +39,26 @@ export const tokenExtractor = (req, res, next) => {
     throw httpError('token missing', 401)
   }
 
+  req.token = authorization.substring(7)
+
   try {
-    req.decodedToken = jwt.verify(authorization.substring(7), SECRET)
+    req.decodedToken = jwt.verify(req.token, SECRET)
   } catch {
     throw httpError('invalid token', 401)
+  }
+
+  next()
+}
+
+export const checkSession = async (req, res, next) => {
+  const session = await Session.findOne({
+    where: {
+      token: req.token,
+    },
+  })
+
+  if (!session) {
+    throw httpError('invalid session', 401)
   }
 
   next()

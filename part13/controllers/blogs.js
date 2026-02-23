@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { Op } from 'sequelize'
 import { Blog, User } from '../models/index.js'
 import { httpError } from '../util/httpError.js'
-import { blogFinder, tokenExtractor } from '../util/middleware.js'
+import { blogFinder, checkSession, tokenExtractor } from '../util/middleware.js'
 
 const router = Router()
 
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
   return res.json(blogs)
 })
 
-router.post('/', tokenExtractor, async (req, res) => {
+router.post('/', tokenExtractor, checkSession, async (req, res) => {
   if (!req.body.title || !req.body.url) {
     throw httpError('title and url are required', 400)
   }
@@ -40,7 +40,7 @@ router.post('/', tokenExtractor, async (req, res) => {
   return res.status(201).json(blog)
 })
 
-router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
+router.delete('/:id', tokenExtractor, checkSession, blogFinder, async (req, res) => {
   if (req.blog.userId !== req.decodedToken.id) {
     throw httpError('forbidden', 403)
   }

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { Blog, ReadingList, User } from '../models/index.js'
 import { httpError } from '../util/httpError.js'
-import { tokenExtractor } from '../util/middleware.js'
+import { checkSession, tokenExtractor } from '../util/middleware.js'
 
 const router = Router()
 
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
   return res.status(201).json(readingList)
 })
 
-router.put('/:id', tokenExtractor, async (req, res) => {
+router.put('/:id', tokenExtractor, checkSession, async (req, res) => {
   const entry = await ReadingList.findOne({
     where: {
       id: req.params.id,

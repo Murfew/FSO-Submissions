@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
-import { User } from '../models/index.js'
+import { Session, User } from '../models/index.js'
 import { SECRET } from '../util/config.js'
 import { httpError } from '../util/httpError.js'
 
@@ -28,6 +28,8 @@ router.post('/', async (request, response) => {
   }
 
   const token = jwt.sign(userForToken, SECRET)
+
+  await Session.create({ token, userId: user.id })
 
   return response.status(200).json({ token, username: user.username, name: user.name })
 })
